@@ -496,6 +496,11 @@ async function checkout() {
             total_amount: finalTotal
         }, cart);
         localStorage.setItem('last_order_code', orderCode);
+        
+        // Instantly update the red dot badge since we just created an order
+        if (typeof updateActiveOrdersBadge === 'function') {
+            updateActiveOrdersBadge();
+        }
     }
 
     let targetPhone = typeof fetchWhatsAppNumberFromSupabase === 'function'
