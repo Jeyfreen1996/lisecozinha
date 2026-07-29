@@ -655,13 +655,13 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-primary text-sm">Senha de Exclus&atilde;o de Pedidos</h4>
-                            <p class="text-[11px] text-on-surface-variant">Prote&ccedil;&atilde;o para excluir pedidos cancelados (Padr&atilde;o: <b>2606</b>)</p>
+                            <p class="text-[11px] text-on-surface-variant">Prote&ccedil;&atilde;o para excluir pedidos cancelados</p>
                         </div>
                     </div>
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block font-bold text-primary mb-1">Senha Atual (para confirmar)</label>
-                            <input type="password" id="cfg-pass-current" placeholder="Digite a senha atual (ex: 2606)"
+                            <input type="password" id="cfg-pass-current" placeholder="Digite a senha atual"
                                 class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold focus:outline-none focus:border-primary" />
                         </div>
                         <div class="grid grid-cols-2 gap-3">
@@ -2232,7 +2232,7 @@
         const currentSavedPass = settings['delete_order_password'] || '2606';
 
         if (currentInput !== currentSavedPass) {
-            alert('Senha atual incorreta! Digite a senha correta (Padrão: 2606).');
+            alert('Senha atual incorreta! Digite a senha correta.');
             return;
         }
 
@@ -2267,31 +2267,67 @@
         }
     }
 
-    /** Delete cancelled order permanently with password confirmation */
-    async function handleDeleteCancelledOrder(orderId, orderCode) {
+    /** Delete cancelled order permanently using custom modal */
+    let pendingDeleteOrderId = null;
+    let pendingDeleteOrderCode = null;
+
+    function handleDeleteCancelledOrder(orderId, orderCode) {
+        pendingDeleteOrderId = orderId;
+        pendingDeleteOrderCode = orderCode;
+        document.getElementById('delete-order-code').innerText = orderCode;
+        document.getElementById('delete-order-pass').value = '';
+        document.getElementById('delete-modal-error').classList.add('hidden');
+        
+        const modal = document.getElementById('delete-order-modal');
+        const content = document.getElementById('delete-order-modal-content');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        content.classList.remove('scale-95');
+        
+        setTimeout(() => document.getElementById('delete-order-pass').focus(), 300);
+    }
+
+    function closeDeleteModal() {
+        pendingDeleteOrderId = null;
+        pendingDeleteOrderCode = null;
+        const modal = document.getElementById('delete-order-modal');
+        const content = document.getElementById('delete-order-modal-content');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        content.classList.add('scale-95');
+    }
+
+    async function confirmDeleteOrder() {
+        if (!pendingDeleteOrderId) return;
+        
         let settings = {};
         if (typeof fetchSettingsFromSupabase === 'function') {
             settings = await fetchSettingsFromSupabase() || {};
         }
         const targetPass = settings['delete_order_password'] || '2606';
-
-        const inputPass = prompt(`Deseja excluir permanentemente o pedido ${orderCode}?\nDigite a senha de segurança (Padrão: 2606):`);
-        if (inputPass === null) return; // User cancelled prompt
+        const inputPass = document.getElementById('delete-order-pass').value;
 
         if (inputPass.trim() !== targetPass) {
-            alert('Senha incorreta! A exclusão do pedido foi cancelada.');
+            document.getElementById('delete-modal-error').classList.remove('hidden');
             return;
         }
 
+        const btn = document.getElementById('confirm-delete-btn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">refresh</span> Excluindo...';
+        btn.disabled = true;
+
         const ok = typeof deleteOrderFromSupabase === 'function'
-            ? await deleteOrderFromSupabase(orderId)
+            ? await deleteOrderFromSupabase(pendingDeleteOrderId)
             : true;
 
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+
         if (ok) {
-            adminOrders = adminOrders.filter(o => o.id !== orderId && o.code !== orderCode);
+            adminOrders = adminOrders.filter(o => o.id !== pendingDeleteOrderId && o.code !== pendingDeleteOrderCode);
             renderAdminOrders();
-            loadAdminData(); // Instantly update metrics (Vendas Totais, Pedidos Ativos)
-            showToast(`Pedido ${orderCode} excluído permanentemente!`, 'success');
+            loadAdminData(); // Instantly update metrics
+            showToast(`Pedido ${pendingDeleteOrderCode} excluído!`, 'success');
+            closeDeleteModal();
         } else {
             alert('Erro ao excluir pedido. Tente novamente.');
         }
@@ -2636,5 +2672,36 @@
         printWin.document.close();
     }
 </script>
+
+<!-- Modal de Exclusão de Pedido -->
+<div id="delete-order-modal" class="fixed inset-0 bg-black/60 z-[100] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-3xl shadow-2xl max-w-sm w-full transform scale-95 transition-transform duration-300 overflow-hidden" id="delete-order-modal-content">
+        <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-red-50">
+            <h3 class="font-headline-md text-xl font-bold text-red-700 flex items-center gap-2">
+                <span class="material-symbols-outlined">warning</span> Excluir Pedido
+            </h3>
+            <button class="p-2 rounded-full hover:bg-red-200 text-red-700 transition-colors" onclick="closeDeleteModal()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <p class="text-sm text-on-surface-variant">Deseja realmente excluir permanentemente o pedido <b id="delete-order-code" class="text-primary"></b>?</p>
+            <p class="text-xs text-red-600 font-bold bg-red-50 p-2 rounded-lg border border-red-100">Atenção: Esta ação não pode ser desfeita!</p>
+            <div>
+                <label class="block text-xs font-bold text-primary mb-1">Senha de Segurança</label>
+                <input type="password" id="delete-order-pass" placeholder="Digite sua senha de exclusão" onkeydown="if(event.key === 'Enter') confirmDeleteOrder()"
+                    class="w-full px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/30 text-sm font-bold focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500" />
+            </div>
+            <div id="delete-modal-error" class="text-xs text-red-600 font-bold hidden">Senha incorreta! Tente novamente.</div>
+        </div>
+        <div class="p-6 pt-2 flex gap-3">
+            <button class="flex-1 bg-surface-container text-on-surface font-bold py-3 rounded-xl hover:bg-surface-container-high transition-colors" onclick="closeDeleteModal()">Cancelar</button>
+            <button class="flex-1 bg-red-700 text-white font-bold py-3 rounded-xl hover:bg-red-800 hover:scale-[1.02] transition-all shadow flex items-center justify-center gap-2" id="confirm-delete-btn" onclick="confirmDeleteOrder()">
+                <span class="material-symbols-outlined text-sm">delete_forever</span> Excluir
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
