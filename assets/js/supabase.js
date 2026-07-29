@@ -872,9 +872,10 @@ async function createOrderInSupabase(orderData, cartItems) {
             .insert([{
                 code: orderData.code,
                 profile_id: currentUser ? currentUser.id : null,
-                customer_name: orderData.customer_name || currentUser.name,
-                customer_phone: orderData.customer_phone || currentUser.phone,
-                delivery_address: orderData.delivery_address || 'Rua das Acácias, 452, Apto 42',
+                customer_name: orderData.customer_name || (currentUser ? currentUser.name : 'Cliente Lise'),
+                customer_phone: orderData.customer_phone || (currentUser ? currentUser.phone : 'Não informado'),
+                delivery_address: orderData.delivery_address || '',
+                address_complement: orderData.address_complement || orderData.complement || '',
                 status: 'aguardando_pagamento',
                 payment_method: 'Pix / WhatsApp',
                 total_amount: orderData.total_amount

@@ -302,6 +302,9 @@ async function checkout() {
     }
     message += `\n*Total: R$ ${finalTotal.toFixed(2).replace('.', ',')}*`;
     message += `\n*Entrega:* ${addrLine}`;
+    if (activeAddr.complement) {
+        message += `\n*Complemento:* ${activeAddr.complement}`;
+    }
     message += `\n\n_Por favor, confirme meu pedido e informe o tempo de entrega!_`;
 
     // Save order to Supabase
@@ -312,6 +315,7 @@ async function checkout() {
             customer_name: profile ? profile.name : 'Cliente Lise',
             customer_phone: profile ? profile.phone : 'Não informado',
             delivery_address: addrLine,
+            address_complement: activeAddr.complement || '',
             total_amount: finalTotal
         }, cart);
         localStorage.setItem('last_order_code', orderCode);
