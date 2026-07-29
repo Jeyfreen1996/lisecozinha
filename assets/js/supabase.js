@@ -973,18 +973,20 @@ async function updateDietaryPreferencesInSupabase(preferencesArray) {
 }
 
 async function fetchAddressesFromSupabase() {
-    if (!supabaseClient) return null;
+    if (!supabaseClient) return [];
     const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.id) return [];
     try {
         const { data, error } = await supabaseClient
             .from('addresses')
             .select('*')
+            .eq('profile_id', currentUser.id)
             .order('is_default', { ascending: false });
         if (error) throw error;
-        return data;
+        return data || [];
     } catch (err) {
         console.error('Fetch addresses error:', err);
-        return null;
+        return [];
     }
 }
 
