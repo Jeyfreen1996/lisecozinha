@@ -226,6 +226,7 @@
                             <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
                                 <th class="py-3 px-2">Código</th>
                                 <th class="py-3 px-2">Cliente</th>
+                                <th class="py-3 px-2">Itens</th>
                                 <th class="py-3 px-2">Endereço</th>
                                 <th class="py-3 px-2">Total</th>
                                 <th class="py-3 px-2">Estado</th>
@@ -254,14 +255,15 @@
                             <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
                                 <th class="py-3 px-3">Código</th>
                                 <th class="py-3 px-3">Cliente / Telefone</th>
+                                <th class="py-3 px-3">Itens do Pedido</th>
                                 <th class="py-3 px-3">Endereço de Entrega</th>
                                 <th class="py-3 px-3">Valor Total</th>
                                 <th class="py-3 px-3">Status Atual</th>
-                                <th class="py-3 px-3 text-right">Alterar Status en Tempo Real</th>
+                                <th class="py-3 px-3 text-right">Alterar Status em Tempo Real</th>
                             </tr>
                         </thead>
                         <tbody id="full-orders-table" class="divide-y divide-outline-variant/20">
-                            <tr><td colspan="6" class="py-4 text-center text-on-surface-variant">Carregando pedidos do Supabase...</td></tr>
+                            <tr><td colspan="7" class="py-4 text-center text-on-surface-variant">Carregando pedidos do Supabase...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1010,12 +1012,32 @@
             const list = limit ? adminOrders.slice(0, limit) : adminOrders;
             return list.map(o => {
                 const addrLine = [o.delivery_address, o.address_complement].filter(Boolean).join(' — ');
+
+                let itemsList = [];
+                if (Array.isArray(o.order_items) && o.order_items.length > 0) {
+                    itemsList = o.order_items.map(i => `${i.quantity}x ${i.product_name}`);
+                } else if (Array.isArray(o.items)) {
+                    itemsList = o.items.map(i => `${i.quantity || 1}x ${i.name || i.product_name}`);
+                } else if (typeof o.items === 'string') {
+                    try {
+                        const parsed = JSON.parse(o.items);
+                        if (Array.isArray(parsed)) itemsList = parsed.map(i => `${i.quantity || 1}x ${i.name || i.product_name}`);
+                    } catch(e) {}
+                }
+
+                const itemsSummary = itemsList.length > 0
+                    ? itemsList.join(', ')
+                    : '<span class="italic text-on-surface-variant/70">Marmitas Fit</span>';
+
                 return `
                 <tr class="hover:bg-surface-container/50 ${o.status === 'aguardando_pagamento' || o.status === 'pending' ? 'bg-yellow-50/50' : ''}">
                     <td class="py-3 px-3 font-bold text-primary">${o.code}</td>
                     <td class="py-3 px-3">
                         <span class="font-bold text-primary block">${o.customer_name}</span>
                         <span class="text-[11px] text-on-surface-variant">${o.customer_phone}</span>
+                    </td>
+                    <td class="py-3 px-3 max-w-[220px]">
+                        <span class="block text-xs font-bold text-primary break-words leading-snug">${itemsSummary}</span>
                     </td>
                     <td class="py-3 px-3 text-on-surface-variant max-w-[160px]">
                         <span class="block text-xs break-words leading-snug">${addrLine || '--'}</span>
@@ -1740,8 +1762,30 @@
         const showCode = cfg.show_code !== false;
 
         let items = [];
-        if (typeof order.items === 'string') { try { items = JSON.parse(order.items); } catch(e) {} }
-        else if (Array.isArray(order.items)) { items = order.items; }
+        if (Array.isArray(order.order_items) && order.order_items.length > 0) {
+            items = order.order_items.map(i => ({
+                name: i.product_name || i.name || 'Item',
+                quantity: i.quantity || 1,
+                price: i.price || 0
+            }));
+        } else if (Array.isArray(order.items)) {
+            items = order.items.map(i => ({
+                name: i.name || i.product_name || 'Item',
+                quantity: i.quantity || 1,
+                price: i.price || 0
+            }));
+        } else if (typeof order.items === 'string') {
+            try {
+                const parsed = JSON.parse(order.items);
+                if (Array.isArray(parsed)) {
+                    items = parsed.map(i => ({
+                        name: i.name || i.product_name || 'Item',
+                        quantity: i.quantity || 1,
+                        price: i.price || 0
+                    }));
+                }
+            } catch(e) {}
+        }
 
         const now = new Date().toLocaleString('pt-BR');
         const sep = '-'.repeat(32);
