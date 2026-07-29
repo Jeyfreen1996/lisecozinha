@@ -123,6 +123,9 @@
                 <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('admins', this)">
                     <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Administradores
                 </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('reports', this)">
+                    <span class="material-symbols-outlined text-sm">analytics</span> Relatórios & Fechamento
+                </button>
                 <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('settings', this)">
                     <span class="material-symbols-outlined text-sm">settings</span> Configurações
                 </button>
@@ -680,6 +683,126 @@
                     </div>
                 </div>
 
+        <!-- 10. RELATÓRIOS & FECHAMENTO DE CAIXA SECTION -->
+        <div id="tab-reports" class="admin-tab-content space-y-8 hidden">
+            <!-- Top Action Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Relatórios Financeiros & Fechamento de Caixa</h3>
+                    <p class="text-xs text-on-surface-variant">Filtre por período, analise o desempenho e realize o fechamento do caixa com emissão de relatório.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="handlePrintReport()" class="bg-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:scale-105 transition-all flex items-center gap-1.5 shadow">
+                        <span class="material-symbols-outlined text-sm">print</span> Imprimir Relatório
+                    </button>
+                    <button onclick="handleCashClosure()" class="bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:scale-105 transition-all flex items-center gap-1.5 shadow">
+                        <span class="material-symbols-outlined text-sm">lock</span> Fechar / Zerar Caixa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls Bar -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 space-y-4">
+                <h4 class="font-bold text-primary text-sm uppercase tracking-wider flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary text-base">filter_alt</span>
+                    Filtro por Período
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Atalho de Período</label>
+                        <select id="report-preset-select" onchange="handleReportPresetChange(this.value)" class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold text-primary focus:outline-none focus:border-primary">
+                            <option value="today">Hoje (Diário)</option>
+                            <option value="7days">Últimos 7 dias (Semanal)</option>
+                            <option value="month" selected>Mês Atual (Mensal)</option>
+                            <option value="2months">Últimos 2 Meses</option>
+                            <option value="3months">Últimos 3 Meses</option>
+                            <option value="year">Último Ano (12 Meses)</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Data Inicial</label>
+                        <input type="date" id="report-start-date" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold text-primary focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Data Final</label>
+                        <input type="date" id="report-end-date" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold text-primary focus:outline-none" />
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="applyReportFilter()" class="w-full bg-secondary text-white font-bold py-2.5 px-4 rounded-xl hover:scale-105 transition-all text-xs flex items-center justify-center gap-1.5 shadow">
+                            <span class="material-symbols-outlined text-sm">search</span> Aplicar Filtro
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Faturamento no Período</span>
+                        <span class="font-headline-xl text-2xl font-bold text-primary" id="rep-revenue">R$ 0,00</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Pedidos Concluídos</span>
+                        <span class="font-headline-xl text-2xl font-bold text-emerald-700" id="rep-completed-count">0</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Ticket Médio</span>
+                        <span class="font-headline-xl text-2xl font-bold text-primary" id="rep-avg-ticket">R$ 0,00</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">receipt</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Pedidos Cancelados</span>
+                        <span class="font-headline-xl text-2xl font-bold text-red-600" id="rep-cancelled-count">0</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">cancel</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Orders Table for Period -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold text-primary text-sm uppercase tracking-wider">Detalhamento dos Pedidos no Período</h4>
+                    <span class="text-xs text-on-surface-variant font-bold" id="rep-period-label">Exibindo: Mês Atual</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Código</th>
+                                <th class="py-3 px-3">Data / Hora</th>
+                                <th class="py-3 px-3">Cliente</th>
+                                <th class="py-3 px-3">Itens</th>
+                                <th class="py-3 px-3">Valor</th>
+                                <th class="py-3 px-3">Pagamento</th>
+                                <th class="py-3 px-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-orders-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="7" class="py-4 text-center text-on-surface-variant italic">Carregando relatório...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -899,12 +1022,15 @@
             'customers': 'Clientes Cadastrados',
             'reviews': 'Gestão de Avaliações',
             'admins': 'Configurações & Administradores',
-            'settings': 'Configurações da Loja'
+            'settings': 'Configurações da Loja',
+            'reports': 'Relatórios & Fechamento de Caixa'
         };
         document.getElementById('admin-tab-title').innerText = titles[tabId] || 'Painel de Gerenciamento';
 
         if (tabId === 'settings') {
             initSettingsTab();
+        } else if (tabId === 'reports') {
+            initReportsTab();
         }
     }
 
@@ -969,14 +1095,31 @@
         document.getElementById('metric-customers').innerText = customers.length;
         document.getElementById('metric-products').innerText = adminProducts.length;
 
-        // Cashbox: sum of paid orders (preparando, saiu_entrega, entregue)
+        // Cashbox: sum of paid orders for today; reset to 0 if all orders deleted or cashbox zeroed
         const cashboxEl = document.getElementById('metric-cashbox');
         if (cashboxEl) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const paidTodaySum = adminOrders
+                .filter(o => {
+                    const isPaid = ['preparando', 'saiu_entrega', 'entregue', 'confirmed', 'cooking', 'delivering', 'delivered'].includes(o.status);
+                    if (!isPaid) return false;
+                    if (!o.created_at) return true;
+                    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+                    return orderDate === todayStr;
+                })
+                .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+
+            let cashboxVal = adminOrders.length === 0 ? 0 : paidTodaySum;
             if (typeof fetchSettingsFromSupabase === 'function') {
                 fetchSettingsFromSupabase().then(s => {
-                    const cashbox = parseFloat(s['cashbox_total'] || '0');
-                    cashboxEl.innerText = `R$ ${cashbox.toFixed(2).replace('.', ',')}`;
+                    const savedCashbox = parseFloat(s['cashbox_total'] || '0');
+                    if (savedCashbox === 0 || adminOrders.length === 0) {
+                        cashboxVal = 0;
+                    }
+                    cashboxEl.innerText = `R$ ${cashboxVal.toFixed(2).replace('.', ',')}`;
                 });
+            } else {
+                cashboxEl.innerText = `R$ ${cashboxVal.toFixed(2).replace('.', ',')}`;
             }
         }
     }
@@ -2218,6 +2361,261 @@
                 if (h) h.value = px.holder || '';
             } catch(e) {}
         }
+    }
+
+    // =============================================
+    // REPORTS & CASH CLOSURE (RELATÓRIOS E FECHAMENTO DE CAIXA)
+    // =============================================
+    let _reportFilteredOrders = [];
+
+    async function initReportsTab() {
+        const select = document.getElementById('report-preset-select');
+        if (select) select.value = 'month';
+        handleReportPresetChange('month');
+    }
+
+    function handleReportPresetChange(preset) {
+        const startDateInput = document.getElementById('report-start-date');
+        const endDateInput = document.getElementById('report-end-date');
+        if (!startDateInput || !endDateInput) return;
+
+        const now = new Date();
+        let start = new Date();
+        let end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+        switch(preset) {
+            case 'today':
+                start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+                break;
+            case '7days':
+                start.setDate(now.getDate() - 7);
+                start.setHours(0, 0, 0, 0);
+                break;
+            case 'month':
+                start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+                break;
+            case '2months':
+                start.setMonth(now.getMonth() - 2);
+                start.setHours(0, 0, 0, 0);
+                break;
+            case '3months':
+                start.setMonth(now.getMonth() - 3);
+                start.setHours(0, 0, 0, 0);
+                break;
+            case 'year':
+                start.setFullYear(now.getFullYear() - 1);
+                start.setHours(0, 0, 0, 0);
+                break;
+            case 'custom':
+                return;
+        }
+
+        const toIsoDate = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        startDateInput.value = toIsoDate(start);
+        endDateInput.value = toIsoDate(end);
+
+        applyReportFilter();
+    }
+
+    function applyReportFilter() {
+        const startVal = document.getElementById('report-start-date')?.value;
+        const endVal = document.getElementById('report-end-date')?.value;
+        const labelEl = document.getElementById('rep-period-label');
+
+        const startTime = startVal ? new Date(`${startVal}T00:00:00`).getTime() : 0;
+        const endTime = endVal ? new Date(`${endVal}T23:59:59`).getTime() : Infinity;
+
+        if (labelEl && startVal && endVal) {
+            const fStart = new Date(`${startVal}T00:00:00`).toLocaleDateString('pt-BR');
+            const fEnd = new Date(`${endVal}T00:00:00`).toLocaleDateString('pt-BR');
+            labelEl.innerText = `Período: ${fStart} a ${fEnd}`;
+        }
+
+        _reportFilteredOrders = adminOrders.filter(o => {
+            if (!o.created_at) return true;
+            const t = new Date(o.created_at).getTime();
+            return t >= startTime && t <= endTime;
+        });
+
+        const paidStatuses = ['preparando', 'saiu_entrega', 'entregue', 'confirmed', 'cooking', 'delivering', 'delivered'];
+        const paidOrders = _reportFilteredOrders.filter(o => paidStatuses.includes(o.status));
+        const cancelledOrders = _reportFilteredOrders.filter(o => ['cancelado', 'cancelled'].includes(o.status));
+
+        const revenue = paidOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+        const avgTicket = paidOrders.length > 0 ? revenue / paidOrders.length : 0;
+
+        document.getElementById('rep-revenue').innerText = `R$ ${revenue.toFixed(2).replace('.', ',')}`;
+        document.getElementById('rep-completed-count').innerText = paidOrders.length;
+        document.getElementById('rep-avg-ticket').innerText = `R$ ${avgTicket.toFixed(2).replace('.', ',')}`;
+        document.getElementById('rep-cancelled-count').innerText = cancelledOrders.length;
+
+        renderReportTable(_reportFilteredOrders);
+    }
+
+    function renderReportTable(orders) {
+        const tableBody = document.getElementById('report-orders-table');
+        if (!tableBody) return;
+
+        if (!orders || orders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-on-surface-variant italic">Nenhum pedido encontrado no período selecionado.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = orders.map(o => {
+            const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('pt-BR') : '--';
+
+            let itemsList = [];
+            if (Array.isArray(o.order_items) && o.order_items.length > 0) {
+                itemsList = o.order_items.map(i => `${i.quantity}x ${i.product_name}`);
+            } else if (Array.isArray(o.items)) {
+                itemsList = o.items.map(i => `${i.quantity || 1}x ${i.name || i.product_name}`);
+            }
+            const itemsText = itemsList.length > 0 ? itemsList.join(', ') : 'Marmitas Fit';
+
+            return `
+                <tr class="hover:bg-surface-container/50">
+                    <td class="py-3 px-3 font-bold text-primary">${o.code}</td>
+                    <td class="py-3 px-3 text-on-surface-variant text-[11px]">${dateStr}</td>
+                    <td class="py-3 px-3 font-bold text-primary">${o.customer_name}</td>
+                    <td class="py-3 px-3 max-w-[200px] text-xs font-bold text-primary break-words">${itemsText}</td>
+                    <td class="py-3 px-3 font-bold text-primary">R$ ${parseFloat(o.total_amount || 0).toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-3 text-on-surface-variant text-[11px]">${o.payment_method || 'Pix / WhatsApp'}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusBadgeClass(o.status)}">
+                            ${getStatusLabel(o.status)}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function handleCashClosure() {
+        if (!confirm("Deseja realizar o FECHAMENTO DE CAIXA do dia?\n\nO caixa será zerado e um registro de fechamento será gravado.")) return;
+
+        if (typeof saveSettingInSupabase === 'function') {
+            await saveSettingInSupabase('cashbox_total', '0.00');
+        } else {
+            const cached = localStorage.getItem('lise_settings') || '{}';
+            let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+            s['cashbox_total'] = '0.00';
+            localStorage.setItem('lise_settings', JSON.stringify(s));
+        }
+
+        showToast('🔒 Fechamento de Caixa realizado com sucesso! Caixa zerado.', 'success');
+        await loadAdminData();
+
+        if (confirm("Fechamento concluído! Deseja imprimir o relatório de fechamento de hoje agora?")) {
+            handlePrintReport();
+        }
+    }
+
+    function handlePrintReport() {
+        const startVal = document.getElementById('report-start-date')?.value || new Date().toISOString().split('T')[0];
+        const endVal = document.getElementById('report-end-date')?.value || new Date().toISOString().split('T')[0];
+
+        const fStart = new Date(`${startVal}T00:00:00`).toLocaleDateString('pt-BR');
+        const fEnd = new Date(`${endVal}T00:00:00`).toLocaleDateString('pt-BR');
+
+        const paidStatuses = ['preparando', 'saiu_entrega', 'entregue', 'confirmed', 'cooking', 'delivering', 'delivered'];
+        const paidOrders = _reportFilteredOrders.filter(o => paidStatuses.includes(o.status));
+        const cancelledOrders = _reportFilteredOrders.filter(o => ['cancelado', 'cancelled'].includes(o.status));
+
+        const revenue = paidOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+        const avgTicket = paidOrders.length > 0 ? revenue / paidOrders.length : 0;
+        const now = new Date().toLocaleString('pt-BR');
+
+        let rowsHtml = '';
+        _reportFilteredOrders.forEach(o => {
+            const dateStr = o.created_at ? new Date(o.created_at).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '--';
+            rowsHtml += `
+                <tr>
+                    <td><b>${o.code}</b></td>
+                    <td>${dateStr}</td>
+                    <td>${o.customer_name}</td>
+                    <td>R$ ${parseFloat(o.total_amount||0).toFixed(2).replace('.',',')}</td>
+                    <td>${getStatusLabel(o.status)}</td>
+                </tr>
+            `;
+        });
+
+        const printWin = window.open('', '_blank', 'width=800,height=900');
+        printWin.document.write(\`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Relatório Financeiro & Fechamento de Caixa</title>
+<style>
+  @page { size: A4 portrait; margin: 15mm; }
+  body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; padding: 10px; }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .sep { border-top: 1px dashed #000; margin: 10px 0; }
+  .row { display: flex; justify-content: space-between; margin: 4px 0; font-size: 13px; }
+  .title { font-size: 18px; font-weight: bold; }
+  .subtitle { font-size: 12px; margin-bottom: 5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11px; }
+  th, td { border-bottom: 1px solid #ddd; padding: 6px 4px; text-align: left; }
+  th { background-color: #f2f2f2; font-weight: bold; }
+  .sig-area { margin-top: 40px; text-align: center; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="center title">LISE COZINHA FIT</div>
+<div class="center subtitle">RELATÓRIO FINANCEIRO E FECHAMENTO DE CAIXA</div>
+<div class="sep"></div>
+
+<div><b>Período do Relatório:</b> \${fStart} até \${fEnd}</div>
+<div><b>Data de Emissão:</b> \${now}</div>
+<div class="sep"></div>
+
+<div class="bold" style="margin-bottom:6px;">RESUMO EXECUTIVO DO CAIXA:</div>
+<div class="row"><span>Faturamento Total (Pago/Confirmado):</span><b>R$ \${revenue.toFixed(2).replace('.',',')}</b></div>
+<div class="row"><span>Total de Pedidos Concluídos:</span><b>\${paidOrders.length}</b></div>
+<div class="row"><span>Ticket Médio por Pedido:</span><b>R$ \${avgTicket.toFixed(2).replace('.',',')}</b></div>
+<div class="row"><span>Pedidos Cancelados no Período:</span><b>\${cancelledOrders.length}</b></div>
+
+<div class="sep"></div>
+<div class="bold">RELAÇÃO DE PEDIDOS NO PERÍODO (\${_reportFilteredOrders.length}):</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Hora</th>
+      <th>Cliente</th>
+      <th>Valor Total</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    \${rowsHtml || '<tr><td colspan="5">Nenhum pedido registrado no período.</td></tr>'}
+  </tbody>
+</table>
+
+<div class="sep"></div>
+<div class="sig-area">
+  _______________________________________________________<br/>
+  <b>Assinatura do Gerente / Responsável pelo Fechamento</b><br/>
+  Lise Cozinha Fit — Sistema de Gerenciamento
+</div>
+
+<script>
+  window.onload = function() {
+    window.print();
+  }
+<\/script>
+</body>
+</html>
+        \`);
+        printWin.document.close();
     }
 </script>
 </body>
