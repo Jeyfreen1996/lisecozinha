@@ -292,14 +292,8 @@ async function checkout() {
     const orderCode = `#LC-${Math.floor(1000 + Math.random() * 9000)}`;
     const addrLine = `${activeAddr.street_address}${activeAddr.city ? ', ' + activeAddr.city : ''}${activeAddr.state ? ' - ' + activeAddr.state : ''}`;
 
-    // Read Pix settings
-    let pixConfig = { key: '', type: 'Chave Pix', holder: '' };
-    if (typeof fetchSettingsFromSupabase === 'function') {
-        const s = await fetchSettingsFromSupabase();
-        if (s['pix_config']) {
-            try { pixConfig = JSON.parse(s['pix_config']); } catch(e) {}
-        }
-    }
+    // Read Pix settings robustly
+    const pixConfig = await getActivePixConfig();
 
     let message = `*Novo Pedido - Lise Cozinha*\n*Código:* ${orderCode}\n\n`;
     cart.forEach(item => {
@@ -360,6 +354,48 @@ async function checkout() {
     } else {
         showToast(`Pedido ${orderCode} enviado para o WhatsApp! Aguardando pagamento.`, 'success');
     }
+}
+
+/** Robustly fetch active Pix configuration from Supabase or localStorage */
+async function getActivePixConfig() {
+    let pixConfig = { type: 'Chave Pix', key: '', holder: '' };
+
+    // 1. Try Supabase or cached settings object
+    if (typeof fetchSettingsFromSupabase === 'function') {
+        const s = await fetchSettingsFromSupabase() || {};
+        if (s['pix_config']) {
+            try {
+                const parsed = typeof s['pix_config'] === 'object' ? s['pix_config'] : JSON.parse(s['pix_config']);
+                if (parsed && parsed.key) return parsed;
+            } catch(e) {}
+        }
+        if (s['pix_key']) {
+            return { type: 'Chave Pix', key: s['pix_key'], holder: '' };
+        }
+    }
+
+    // 2. Try direct localStorage fallback
+    const localSettingsStr = localStorage.getItem('lise_settings');
+    if (localSettingsStr) {
+        try {
+            const localSettings = JSON.parse(localSettingsStr);
+            if (localSettings.pix_config) {
+                const parsed = typeof localSettings.pix_config === 'object' ? localSettings.pix_config : JSON.parse(localSettings.pix_config);
+                if (parsed && parsed.key) return parsed;
+            }
+            if (localSettings.pix_key) return { type: 'Chave Pix', key: localSettings.pix_key, holder: '' };
+        } catch(e) {}
+    }
+
+    const localPixStr = localStorage.getItem('lise_pix_config');
+    if (localPixStr) {
+        try {
+            const parsed = JSON.parse(localPixStr);
+            if (parsed && parsed.key) return parsed;
+        } catch(e) {}
+    }
+
+    return pixConfig;
 }
 
 /** Show interactive Pix payment modal on screen */

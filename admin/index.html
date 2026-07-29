@@ -1983,12 +1983,15 @@
 
             if (typeof saveSettingInSupabase === 'function') {
                 await saveSettingInSupabase('pix_config', JSON.stringify(pixData));
+                await saveSettingInSupabase('pix_key', key);
             } else {
                 const cached = localStorage.getItem('lise_settings') || '{}';
                 let s = {}; try { s = JSON.parse(cached); } catch(e) {}
                 s['pix_config'] = JSON.stringify(pixData);
+                s['pix_key'] = key;
                 localStorage.setItem('lise_settings', JSON.stringify(s));
             }
+            localStorage.setItem('lise_pix_config', JSON.stringify(pixData));
         } catch(e) {
             console.warn('savePixConfig notice:', e);
         }
