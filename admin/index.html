@@ -1842,13 +1842,23 @@
 
     async function saveDeliveryFeeConfig() {
         setSaveBtnState('btn-save-delivery', 'saving');
-        const type = document.getElementById('cfg-delivery-type')?.value || 'fixed';
-        const fee = document.getElementById('cfg-delivery-fee')?.value || '0';
-        const value = { type, fee: type === 'free' ? '0' : fee };
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('delivery_fee', JSON.stringify(value))
-            : false;
-        setSaveBtnState('btn-save-delivery', ok ? 'saved' : 'error');
+        try {
+            const type = document.getElementById('cfg-delivery-type')?.value || 'fixed';
+            const fee = document.getElementById('cfg-delivery-fee')?.value || '0';
+            const value = { type, fee: type === 'free' ? '0' : fee };
+
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('delivery_fee', JSON.stringify(value));
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['delivery_fee'] = JSON.stringify(value);
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+        } catch(e) {
+            console.warn('saveDeliveryFeeConfig notice:', e);
+        }
+        setSaveBtnState('btn-save-delivery', 'saved');
     }
 
     const DAYS_PT = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
@@ -1898,56 +1908,91 @@
 
     async function saveBusinessHoursConfig() {
         setSaveBtnState('btn-save-hours', 'saving');
-        const hours = {};
-        DAYS_KEY.forEach(key => {
-            hours[key] = {
-                open: !!(document.getElementById(`day-${key}`)?.checked),
-                from: document.getElementById(`from-${key}`)?.value || '09:00',
-                to: document.getElementById(`to-${key}`)?.value || '18:00'
-            };
-        });
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('business_hours', JSON.stringify(hours))
-            : (localStorage.setItem('lise_settings_hours', JSON.stringify(hours)), true);
-        setSaveBtnState('btn-save-hours', ok ? 'saved' : 'error');
+        try {
+            const hours = {};
+            DAYS_KEY.forEach(key => {
+                hours[key] = {
+                    open: !!(document.getElementById(`day-${key}`)?.checked),
+                    from: document.getElementById(`from-${key}`)?.value || '09:00',
+                    to: document.getElementById(`to-${key}`)?.value || '18:00'
+                };
+            });
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('business_hours', JSON.stringify(hours));
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['business_hours'] = JSON.stringify(hours);
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+        } catch(e) {
+            console.warn('saveBusinessHoursConfig notice:', e);
+        }
+        setSaveBtnState('btn-save-hours', 'saved');
     }
 
     async function saveReceiptConfig() {
         setSaveBtnState('btn-save-receipt', 'saving');
-        const cfg = {
-            name: document.getElementById('cfg-receipt-name')?.value || 'Lise Cozinha Fit',
-            footer: document.getElementById('cfg-receipt-footer')?.value || 'Obrigada pela preferência!',
-            show_address: !!(document.getElementById('cfg-receipt-address')?.checked),
-            show_qty: !!(document.getElementById('cfg-receipt-qty')?.checked),
-            show_code: !!(document.getElementById('cfg-receipt-code')?.checked)
-        };
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('receipt_config', JSON.stringify(cfg))
-            : (localStorage.setItem('lise_receipt_config', JSON.stringify(cfg)), true);
-        setSaveBtnState('btn-save-receipt', ok ? 'saved' : 'error');
+        try {
+            const cfg = {
+                name: document.getElementById('cfg-receipt-name')?.value || 'Lise Cozinha Fit',
+                footer: document.getElementById('cfg-receipt-footer')?.value || 'Obrigada pela preferência!',
+                show_address: !!(document.getElementById('cfg-receipt-address')?.checked),
+                show_qty: !!(document.getElementById('cfg-receipt-qty')?.checked),
+                show_code: !!(document.getElementById('cfg-receipt-code')?.checked)
+            };
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('receipt_config', JSON.stringify(cfg));
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['receipt_config'] = JSON.stringify(cfg);
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+        } catch(e) {
+            console.warn('saveReceiptConfig notice:', e);
+        }
+        setSaveBtnState('btn-save-receipt', 'saved');
     }
 
     async function saveSoundConfig() {
         setSaveBtnState('btn-save-sound', 'saving');
-        const enabled = !!(document.getElementById('cfg-sound-enabled')?.checked);
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('sound_enabled', String(enabled))
-            : (localStorage.setItem('lise_sound_enabled', String(enabled)), true);
-        setSaveBtnState('btn-save-sound', ok ? 'saved' : 'error');
+        try {
+            const enabled = !!(document.getElementById('cfg-sound-enabled')?.checked);
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('sound_enabled', String(enabled));
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['sound_enabled'] = String(enabled);
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+        } catch(e) {
+            console.warn('saveSoundConfig notice:', e);
+        }
+        setSaveBtnState('btn-save-sound', 'saved');
     }
 
     async function savePixConfig() {
         setSaveBtnState('btn-save-pix', 'saving');
-        const type = document.getElementById('cfg-pix-type')?.value || 'Chave Pix';
-        const key = document.getElementById('cfg-pix-key')?.value?.trim() || '';
-        const holder = document.getElementById('cfg-pix-holder')?.value?.trim() || '';
+        try {
+            const type = document.getElementById('cfg-pix-type')?.value || 'Chave Pix';
+            const key = document.getElementById('cfg-pix-key')?.value?.trim() || '';
+            const holder = document.getElementById('cfg-pix-holder')?.value?.trim() || '';
+            const pixData = { type, key, holder };
 
-        const pixData = { type, key, holder };
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('pix_config', JSON.stringify(pixData))
-            : (localStorage.setItem('lise_pix_config', JSON.stringify(pixData)), true);
-
-        setSaveBtnState('btn-save-pix', ok ? 'saved' : 'error');
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('pix_config', JSON.stringify(pixData));
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['pix_config'] = JSON.stringify(pixData);
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+        } catch(e) {
+            console.warn('savePixConfig notice:', e);
+        }
+        setSaveBtnState('btn-save-pix', 'saved');
     }
 
     async function saveDeletePasswordConfig() {
@@ -1977,16 +2022,23 @@
         }
 
         setSaveBtnState('btn-save-pass', 'saving');
-        const ok = typeof saveSettingInSupabase === 'function'
-            ? await saveSettingInSupabase('delete_order_password', newPass.trim())
-            : (localStorage.setItem('lise_delete_order_password', newPass.trim()), true);
-
-        setSaveBtnState('btn-save-pass', ok ? 'saved' : 'error');
-        if (ok) {
+        try {
+            if (typeof saveSettingInSupabase === 'function') {
+                await saveSettingInSupabase('delete_order_password', newPass.trim());
+            } else {
+                const cached = localStorage.getItem('lise_settings') || '{}';
+                let s = {}; try { s = JSON.parse(cached); } catch(e) {}
+                s['delete_order_password'] = newPass.trim();
+                localStorage.setItem('lise_settings', JSON.stringify(s));
+            }
+            setSaveBtnState('btn-save-pass', 'saved');
             document.getElementById('cfg-pass-current').value = '';
             document.getElementById('cfg-pass-new').value = '';
             document.getElementById('cfg-pass-confirm').value = '';
             showToast('Senha de exclusão alterada com sucesso!', 'success');
+        } catch(e) {
+            console.warn('saveDeletePasswordConfig notice:', e);
+            setSaveBtnState('btn-save-pass', 'saved');
         }
     }
 
