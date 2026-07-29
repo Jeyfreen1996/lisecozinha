@@ -235,27 +235,6 @@
     async function loadOrdersFromSupabase() {
         if (typeof fetchActiveOrdersFromSupabase !== 'function') return;
 
-        if (typeof isUserLoggedIn === 'function' && !isUserLoggedIn()) {
-            const activeContainer = document.getElementById('active-order-container');
-            const pastContainer = document.getElementById('past-orders-container');
-            if (activeContainer) {
-                activeContainer.innerHTML = `
-                    <div class="bg-surface rounded-2xl p-8 border border-outline-variant/30 text-center organic-shadow">
-                        <span class="material-symbols-outlined text-4xl text-primary mb-2">receipt_long</span>
-                        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Acompanhe seus Pedidos em Tempo Real</h4>
-                        <p class="text-on-surface-variant text-xs mb-5 max-w-sm mx-auto">Faça login ou crie sua conta para ver seu pedido em andamento e histórico de refeições.</p>
-                        <button onclick="openAuthModal('login')" class="bg-primary text-white font-bold px-6 py-2.5 rounded-xl text-xs font-label-md hover:bg-primary-container transition-all shadow-md">
-                            Entrar ou Criar Conta
-                        </button>
-                    </div>
-                `;
-            }
-            if (pastContainer) {
-                pastContainer.innerHTML = `<div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs italic">Faça login para ver seu histórico.</div>`;
-            }
-            return;
-        }
-
         // Active Order
         const activeOrders = await fetchActiveOrdersFromSupabase();
         const activeContainer = document.getElementById('active-order-container');
@@ -267,16 +246,20 @@
                     ? `${order.order_items.length} itens (${order.order_items.map(i => i.product_name).slice(0, 2).join(', ')}...)`
                     : 'Marmitas Fit Selecionadas';
 
-                let statusText = 'Em Preparo na Cozinha';
-                let icon = 'skillet';
-                let step1Active = true, step2Active = true, step3Active = false;
+                let statusText = '💳 Aguardando Pagamento';
+                let icon = 'payments';
+                let step1Active = true, step2Active = false, step3Active = false;
 
-                if (order.status === 'pending' || order.status === 'confirmed') {
-                    statusText = 'Pedido Confirmado';
-                    icon = 'check_circle';
+                if (order.status === 'aguardando_pagamento' || order.status === 'pending') {
+                    statusText = '💳 Aguardando Pagamento';
+                    icon = 'payments';
                     step1Active = true; step2Active = false; step3Active = false;
-                } else if (order.status === 'delivering') {
-                    statusText = 'Saiu para Entrega';
+                } else if (order.status === 'preparando' || order.status === 'confirmed' || order.status === 'cooking') {
+                    statusText = '🍳 Em Preparo na Cozinha';
+                    icon = 'skillet';
+                    step1Active = true; step2Active = true; step3Active = false;
+                } else if (order.status === 'saiu_entrega' || order.status === 'delivering') {
+                    statusText = '🛵 Saiu para Entrega';
                     icon = 'delivery_dining';
                     step1Active = true; step2Active = true; step3Active = true;
                 }

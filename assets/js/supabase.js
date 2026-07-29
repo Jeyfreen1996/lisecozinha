@@ -357,16 +357,36 @@ async function saveReviewToSupabase(review) {
 async function fetchActiveOrdersFromSupabase() {
     if (!supabaseClient) return [];
     const user = getCurrentUser();
-    if (!user || !user.id) return [];
+    const lastOrderCode = localStorage.getItem('last_order_code');
 
     try {
-        const { data, error } = await supabaseClient
+        let query = supabaseClient
             .from('orders')
             .select('*, order_items(*)')
-            .eq('profile_id', user.id)
-            .in('status', ['pending', 'confirmed', 'cooking', 'delivering'])
+            .in('status', ['aguardando_pagamento', 'preparando', 'saiu_entrega', 'pending', 'confirmed', 'cooking', 'delivering'])
             .order('created_at', { ascending: false });
+
+        if (user && user.id) {
+            query = query.eq('profile_id', user.id);
+        } else if (lastOrderCode) {
+            query = query.eq('code', lastOrderCode);
+        } else {
+            return [];
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
+
+        // If user logged in but no orders under profile_id, check if lastOrderCode matches
+        if ((!data || data.length === 0) && lastOrderCode) {
+            const { data: codeData } = await supabaseClient
+                .from('orders')
+                .select('*, order_items(*)')
+                .eq('code', lastOrderCode)
+                .in('status', ['aguardando_pagamento', 'preparando', 'saiu_entrega', 'pending', 'confirmed', 'cooking', 'delivering']);
+            if (codeData && codeData.length > 0) return codeData;
+        }
+
         return data || [];
     } catch (err) {
         console.error('Fetch active orders error:', err);
@@ -384,7 +404,7 @@ async function fetchPastOrdersFromSupabase() {
             .from('orders')
             .select('*, order_items(*)')
             .eq('profile_id', user.id)
-            .eq('status', 'delivered')
+            .in('status', ['entregue', 'delivered', 'cancelado', 'cancelled'])
             .order('created_at', { ascending: false });
         if (error) throw error;
         return data || [];
