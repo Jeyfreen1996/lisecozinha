@@ -335,9 +335,13 @@
                 pastContainer.innerHTML = pastOrders.map(po => {
                     const title = po.order_items && po.order_items.length > 0 
                         ? po.order_items[0].product_name 
-                        : 'Pedido Concluído Lise Cozinha';
+                        : 'Pedido Lise Cozinha';
                     const firstImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80';
                     const itemsJson = JSON.stringify(po.order_items ? po.order_items.map(i => ({id: i.product_id, name: i.product_name, price: i.price})) : []).replace(/"/g, '&quot;');
+
+                    const isCancelled = po.status === 'cancelado' || po.status === 'cancelled';
+                    const badgeText = isCancelled ? '❌ Cancelado' : '✅ Entregue';
+                    const badgeClass = isCancelled ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800';
 
                     return `
                         <div class="bg-surface rounded-2xl p-5 border border-outline-variant/30 hover:border-primary-container/40 transition-all flex flex-col md:flex-row gap-4 items-start md:items-center justify-between organic-shadow">
@@ -348,7 +352,7 @@
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span class="font-label-md text-xs text-on-surface-variant font-bold">${po.code}</span>
-                                        <span class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">Entregue</span>
+                                        <span class="${badgeClass} text-[10px] px-2.5 py-0.5 rounded-full font-bold">${badgeText}</span>
                                     </div>
                                     <h5 class="font-headline-md font-bold text-primary text-base mt-0.5">${title}</h5>
                                     <span class="text-on-surface-variant text-xs">R$ ${parseFloat(po.total_amount).toFixed(2).replace('.', ',')} • ${po.payment_method}</span>
