@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Cadastre seu Restaurante | Delivery SaaS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0f172a",
+                        "secondary": "#2563eb",
+                        "background": "#f8fafc",
+                        "surface": "#ffffff",
+                        "surface-container": "#f1f5f9",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 font-body-md min-h-screen flex flex-col justify-between">
+
+<!-- Header -->
+<header class="py-6 px-4 md:px-8 max-w-7xl mx-auto w-full flex justify-between items-center">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xl shadow-lg">S</div>
+        <span class="font-headline-lg text-lg font-bold">Delivery SaaS Platform</span>
+    </div>
+    <a href="/admin" class="text-xs text-slate-300 hover:text-white font-bold flex items-center gap-1 bg-white/10 px-4 py-2 rounded-full backdrop-blur">
+        <span class="material-symbols-outlined text-sm">login</span> Entrar no meu Restaurante
+    </a>
+</header>
+
+<!-- Main Signup Form -->
+<main class="max-w-xl mx-auto w-full px-4 py-8">
+    <div class="bg-white text-slate-900 rounded-3xl p-8 md:p-10 organic-shadow shadow-2xl border border-slate-200">
+        <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider block w-fit mb-3">Onboarding de Novos Restaurantes</span>
+        <h2 class="font-headline-lg text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Crie seu Cardápio Digital em 30 segundos</h2>
+        <p class="text-xs text-slate-500 mb-6">Receba pedidos ilimitados direto no seu WhatsApp sem comissões por venda!</p>
+
+        <form onsubmit="handleStoreSignup(event)" class="space-y-4 text-xs">
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">Nome do seu Restaurante ou Cozinha</label>
+                <input type="text" id="signup-store-name" required placeholder="Ex: Sabor Natural Fit" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">Slug / Identificador da sua Loja (URL)</label>
+                <div class="flex items-center bg-slate-50 rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-500">
+                    <span>sualoja.com/?store=</span>
+                    <input type="text" id="signup-store-slug" required placeholder="sabornatural" class="w-full bg-transparent border-none p-0 text-xs font-mono font-bold text-blue-600 focus:ring-0" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">WhatsApp para Receber Pedidos (com DDD)</label>
+                <input type="text" id="signup-store-whatsapp" required placeholder="5548999998888" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+            </div>
+
+            <div class="border-t border-slate-100 pt-4 mt-4">
+                <span class="block font-bold text-slate-900 text-xs mb-3">Dados de Acesso do Administrador</span>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Seu Nome Completo</label>
+                        <input type="text" id="signup-admin-name" required placeholder="Ex: João da Silva" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Seu E-mail de Login</label>
+                        <input type="email" id="signup-admin-email" required placeholder="joao@sabornatural.com" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Senha de Acesso</label>
+                        <input type="password" id="signup-admin-pass" required placeholder="••••••••" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mt-6">
+                <span class="material-symbols-outlined text-base">rocket_launch</span> Criar minha Loja & Começar
+            </button>
+        </form>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="py-6 text-center text-xs text-slate-400 border-t border-slate-800">
+    &copy; 2026 Delivery SaaS Platform. Todos os direitos reservados.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script>
+    async function handleStoreSignup(e) {
+        e.preventDefault();
+        const storeName = document.getElementById('signup-store-name').value;
+        const storeSlug = document.getElementById('signup-store-slug').value.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const storeWhatsapp = document.getElementById('signup-store-whatsapp').value;
+        const adminName = document.getElementById('signup-admin-name').value;
+        const adminEmail = document.getElementById('signup-admin-email').value;
+        const adminPass = document.getElementById('signup-admin-pass').value;
+
+        // 1. Create Tenant Store in Supabase
+        const tenantRes = await createTenantInSupabase({
+            name: storeName,
+            slug: storeSlug,
+            whatsapp_number: storeWhatsapp,
+            plan: 'pro',
+            status: 'active'
+        });
+
+        if (tenantRes && tenantRes.length > 0) {
+            const newTenant = tenantRes[0];
+
+            // 2. Create Admin Account for the Store
+            await createAdminInSupabase(adminName, adminEmail, adminPass);
+
+            // 3. Save active store slug and redirect to Admin Dashboard
+            localStorage.setItem('lise_tenant_slug', newTenant.slug);
+            alert(`Parabéns! Sua loja "${storeName}" foi criada com sucesso! Redirecionando para o seu Painel de Administração...`);
+            window.location.href = `/?store=${newTenant.slug}`;
+        } else {
+            alert('Erro ao cadastrar loja. Verifique se o identificador/slug já está em uso.');
+        }
+    }
+</script>
+</body>
+</html>

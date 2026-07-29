@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Painel Super Admin | Lise Cozinha Fit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(27, 67, 50, 0.08);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#012d1d",
+                        "primary-container": "#1b4332",
+                        "on-primary-container": "#86af99",
+                        "secondary": "#904d00",
+                        "secondary-container": "#fe932c",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#414844",
+                        "outline-variant": "#c1c8c2"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+
+<!-- 1. ADMIN LOGIN SCREEN (Displayed when unauthenticated) -->
+<div id="admin-login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary via-primary-container to-primary text-white">
+    <div class="bg-surface text-on-surface rounded-3xl p-8 md:p-10 max-w-md w-full organic-shadow shadow-2xl border border-outline-variant/30 relative">
+        <div class="w-16 h-16 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg">L</div>
+        <h2 class="font-headline-lg text-2xl font-bold text-center text-primary mb-1">Acesso Restrito</h2>
+        <p class="text-xs text-center text-on-surface-variant mb-6">Painel Administrativo Lise Cozinha</p>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
+            <div>
+                <label class="block font-bold text-primary mb-1 uppercase tracking-wider text-[10px]">E-mail de Administrador</label>
+                <input type="email" id="admin-login-email" required placeholder="Seu e-mail" class="w-full px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary text-primary font-bold" />
+            </div>
+
+            <div>
+                <label class="block font-bold text-primary mb-1 uppercase tracking-wider text-[10px]">Senha de Acesso</label>
+                <input type="password" id="admin-login-password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary text-primary font-bold" />
+            </div>
+
+            <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-sm hover:bg-primary-container transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mt-6">
+                <span class="material-symbols-outlined text-base">lock_open</span> Entrar no Painel Admin
+            </button>
+        </form>
+
+        <div class="mt-6 pt-4 border-t border-outline-variant/30 text-center">
+            <a href="/" class="inline-block text-xs text-secondary font-bold hover:underline">← Voltar para a Loja</a>
+        </div>
+    </div>
+</div>
+
+<!-- 2. ADMIN DASHBOARD LAYOUT (Displayed when authenticated) -->
+<div id="admin-app-layout" class="min-h-screen flex flex-col md:flex-row hidden">
+
+    <!-- Admin Sidebar Nav -->
+    <aside class="w-full md:w-64 bg-primary text-white p-6 flex flex-col justify-between flex-shrink-0">
+        <div>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-lg shadow-lg">L</div>
+                <div>
+                    <h1 class="font-headline-md font-bold text-lg leading-tight">Lise Cozinha</h1>
+                    <span class="text-[10px] text-on-primary-container uppercase font-bold tracking-wider" id="admin-user-display">Super Admin</span>
+                </div>
+            </div>
+
+            <nav class="space-y-2">
+                <button class="admin-nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('overview', this)">
+                    <span class="material-symbols-outlined text-sm">dashboard</span> Visão Geral
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('orders', this)">
+                    <span class="material-symbols-outlined text-sm">receipt_long</span> Pedidos en Tempo Real
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('products', this)">
+                    <span class="material-symbols-outlined text-sm">restaurant_menu</span> Gerenciar Cardápio
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('categories', this)">
+                    <span class="material-symbols-outlined text-sm">category</span> Categorias
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('coupons', this)">
+                    <span class="material-symbols-outlined text-sm">local_offer</span> Cupons de Desconto
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('customers', this)">
+                    <span class="material-symbols-outlined text-sm">group</span> Clientes Cadastrados
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('reviews', this)">
+                    <span class="material-symbols-outlined text-sm">rate_review</span> Avaliações
+                </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('admins', this)">
+                    <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Administradores
+                </button>
+            </nav>
+        </div>
+
+        <div class="pt-6 border-t border-white/10 space-y-2">
+            <a href="/" class="flex items-center gap-2 text-xs text-white/70 hover:text-white font-bold transition-colors">
+                <span class="material-symbols-outlined text-sm">arrow_back</span> Voltar para a Loja
+            </a>
+            <button onclick="logoutAdminFromSupabase()" class="flex items-center gap-2 text-xs text-red-300 hover:text-white font-bold transition-colors w-full text-left pt-2">
+                <span class="material-symbols-outlined text-sm">logout</span> Sair do Painel Admin
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Admin Content Area -->
+    <main class="flex-grow p-6 md:p-10 overflow-y-auto">
+        
+        <!-- Top Bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-outline-variant/30 pb-4">
+            <div>
+                <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-primary" id="admin-tab-title">Painel de Gerenciamento</h2>
+                <p class="text-xs text-on-surface-variant mt-0.5">Sincronizado com Supabase Realtime Project: <code class="bg-surface-container px-2 py-0.5 rounded font-mono text-[11px] text-primary">ssgmqogrowvxjluwtyrs</code></p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full border border-emerald-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Realtime Conectado
+                </span>
+                <button class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl hover:scale-105 transition-transform flex items-center gap-1.5" onclick="loadAdminData()">
+                    <span class="material-symbols-outlined text-sm">refresh</span> Atualizar Dados
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. OVERVIEW SECTION -->
+        <div id="tab-overview" class="admin-tab-content space-y-8">
+            <!-- Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Vendas Totais</span>
+                        <span class="font-headline-xl text-2xl font-bold text-primary" id="metric-revenue">R$ 0,00</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Pedidos Ativos</span>
+                        <span class="font-headline-xl text-2xl font-bold text-secondary" id="metric-active-orders">0</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">skillet</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Clientes Cadastrados</span>
+                        <span class="font-headline-xl text-2xl font-bold text-primary" id="metric-customers">0</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">group</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Pratos no Cardápio</span>
+                        <span class="font-headline-xl text-2xl font-bold text-primary" id="metric-products">0</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">restaurant_menu</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Active Orders Preview -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-headline-md text-lg font-bold text-primary">Últimos Pedidos Recebidos</h3>
+                    <button class="text-secondary text-xs font-bold hover:underline" onclick="switchAdminTab('orders')">Ver todos</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-2">Código</th>
+                                <th class="py-3 px-2">Cliente</th>
+                                <th class="py-3 px-2">Endereço</th>
+                                <th class="py-3 px-2">Total</th>
+                                <th class="py-3 px-2">Estado</th>
+                                <th class="py-3 px-2 text-right">Ação em Tempo Real</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overview-orders-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="6" class="py-4 text-center text-on-surface-variant">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. REALTIME ORDERS MANAGEMENT SECTION -->
+        <div id="tab-orders" class="admin-tab-content space-y-6 hidden">
+            <div class="flex justify-between items-center">
+                <h3 class="font-headline-md text-xl font-bold text-primary">Gestão de Pedidos en Tempo Real</h3>
+                <span class="text-xs text-on-surface-variant">Qualquer mudança de estado notifica instantaneamente o cliente!</span>
+            </div>
+
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Código</th>
+                                <th class="py-3 px-3">Cliente / Telefone</th>
+                                <th class="py-3 px-3">Endereço de Entrega</th>
+                                <th class="py-3 px-3">Valor Total</th>
+                                <th class="py-3 px-3">Status Atual</th>
+                                <th class="py-3 px-3 text-right">Alterar Status en Tempo Real</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-orders-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="6" class="py-4 text-center text-on-surface-variant">Carregando pedidos do Supabase...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. PRODUCTS MENU MANAGEMENT SECTION -->
+        <div id="tab-products" class="admin-tab-content space-y-6 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Gestão do Cardápio</h3>
+                    <p class="text-xs text-on-surface-variant">Adicione, edite ou remova pratos do Supabase</p>
+                </div>
+                <button class="bg-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-primary-container transition-all shadow-md flex items-center gap-1.5" onclick="openNewProductModal()">
+                    <span class="material-symbols-outlined text-sm">add</span> Adicionar Novo Prato
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="admin-products-grid">
+                <!-- Products loaded here -->
+            </div>
+        </div>
+
+        <!-- 4. CATEGORIES MANAGEMENT SECTION -->
+        <div id="tab-categories" class="admin-tab-content space-y-6 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Gestão de Categorias do Cardápio</h3>
+                    <p class="text-xs text-on-surface-variant">Crie e edite as categorias exibidas no cardápio da loja</p>
+                </div>
+                <button class="bg-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-primary-container transition-all shadow-md flex items-center gap-1.5" onclick="openNewCategoryModal()">
+                    <span class="material-symbols-outlined text-sm">add</span> Nova Categoria
+                </button>
+            </div>
+
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Ícone</th>
+                                <th class="py-3 px-3">Nome da Categoria</th>
+                                <th class="py-3 px-3">Slug (Identificador)</th>
+                                <th class="py-3 px-3">Descrição</th>
+                                <th class="py-3 px-3 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-categories-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="5" class="py-4 text-center text-on-surface-variant">Carregando categorias...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. DISCOUNT COUPONS MANAGEMENT SECTION -->
+        <div id="tab-coupons" class="admin-tab-content space-y-6 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Gestão de Cupons de Desconto</h3>
+                    <p class="text-xs text-on-surface-variant">Crie cupons de porcentagem ou valor fixo para seus clientes</p>
+                </div>
+                <button class="bg-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-primary-container transition-all shadow-md flex items-center gap-1.5" onclick="openNewCouponModal()">
+                    <span class="material-symbols-outlined text-sm">add</span> Criar Novo Cupom
+                </button>
+            </div>
+
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Código do Cupom</th>
+                                <th class="py-3 px-3">Tipo de Desconto</th>
+                                <th class="py-3 px-3">Valor do Desconto</th>
+                                <th class="py-3 px-3">Pedido Mínimo</th>
+                                <th class="py-3 px-3">Status</th>
+                                <th class="py-3 px-3 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-coupons-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="6" class="py-4 text-center text-on-surface-variant">Carregando cupons...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. CUSTOMERS SECTION -->
+        <div id="tab-customers" class="admin-tab-content space-y-6 hidden">
+            <h3 class="font-headline-md text-xl font-bold text-primary">Clientes Cadastrados no Supabase</h3>
+            
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Nome</th>
+                                <th class="py-3 px-3">WhatsApp / Telefone</th>
+                                <th class="py-3 px-3">E-mail</th>
+                                <th class="py-3 px-3">Status</th>
+                                <th class="py-3 px-3">Data Cadastro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-customers-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="5" class="py-4 text-center text-on-surface-variant">Carregando clientes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. REVIEWS MANAGEMENT SECTION -->
+        <div id="tab-reviews" class="admin-tab-content space-y-6 hidden">
+            <h3 class="font-headline-md text-xl font-bold text-primary">Gestão de Avaliações dos Clientes</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="admin-reviews-grid">
+                <!-- Reviews loaded here -->
+            </div>
+        </div>
+
+        <!-- 8. ADMINS & CONFIGURATION SECTION -->
+        <div id="tab-admins" class="admin-tab-content space-y-8 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Configurações & Administradores</h3>
+                    <p class="text-xs text-on-surface-variant">Configure o WhatsApp da loja e gerencie contas de administradores</p>
+                </div>
+            </div>
+
+            <!-- Store Settings: WhatsApp Number Configuration -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 max-w-xl">
+                <div class="flex items-center gap-2 text-primary mb-3">
+                    <span class="material-symbols-outlined text-secondary">chat</span>
+                    <h4 class="font-headline-md text-sm font-bold text-primary">Número do WhatsApp para Receber Pedidos</h4>
+                </div>
+                <p class="text-xs text-on-surface-variant mb-4">Insira o número com DDD (ex: 554898591226) para onde todos os pedidos do carrinho serão enviados ao finalizar.</p>
+
+                <form onsubmit="handleSaveWhatsAppNumber(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Número do WhatsApp da Loja</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="admin-whatsapp-number" required placeholder="554898591226" class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm font-bold text-primary focus:outline-none focus:border-primary" />
+                            <button type="submit" class="bg-secondary text-white py-2.5 px-5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow-md flex-shrink-0 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">save</span> Salvar Número
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Form: Create New Admin -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 max-w-xl">
+                <h4 class="font-headline-md text-sm font-bold text-primary mb-3">Cadastrar Novo Administrador</h4>
+                <form onsubmit="handleCreateAdminSubmit(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Nome Completo do Admin</label>
+                        <input type="text" id="admin-new-name" required placeholder="Ex: Carlos Oliveira" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-primary mb-1">E-mail de Acesso</label>
+                        <input type="email" id="admin-new-email" required placeholder="Seu e-mail" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-primary mb-1">Senha de Acesso</label>
+                        <input type="password" id="admin-new-pass" required placeholder="Sua senha secreta" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                    </div>
+                    <button type="submit" class="bg-primary text-white py-2.5 px-6 rounded-xl font-bold text-xs hover:bg-primary-container transition-all shadow-md mt-2 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">person_add</span> Criar Administrador
+                    </button>
+                </form>
+            </div>
+
+            <!-- Table of Registered Admins -->
+            <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <h4 class="font-headline-md text-sm font-bold text-primary mb-4">Administradores Cadastrados no Supabase</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase font-bold text-[10px]">
+                                <th class="py-3 px-3">Nome</th>
+                                <th class="py-3 px-3">E-mail</th>
+                                <th class="py-3 px-3">Cargo</th>
+                                <th class="py-3 px-3">Data de Criação</th>
+                                <th class="py-3 px-3 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admins-list-table" class="divide-y divide-outline-variant/20">
+                            <tr><td colspan="5" class="py-4 text-center text-on-surface-variant">Carregando administradores...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Add / Edit Product Modal -->
+<div class="fixed inset-0 bg-black/60 z-[120] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="new-product-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-outline-variant/30 relative max-h-[90vh] overflow-y-auto">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeNewProductModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1" id="prod-modal-title">Cadastrar Novo Prato</h3>
+        <p class="text-xs text-on-surface-variant mb-4">Atualiza o cardápio em tempo real no Supabase</p>
+
+        <form onsubmit="handleProductSubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="prod-id" value="" />
+            
+            <div>
+                <label class="block font-bold text-primary mb-1">Nome do Prato</label>
+                <input type="text" id="prod-name" required placeholder="Ex: Risoto Fit de Funghi" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Descrição</label>
+                <textarea id="prod-desc" required rows="2" placeholder="Ingredientes e modo de preparo..." class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-primary mb-1">Preço (R$)</label>
+                    <input type="number" step="0.01" id="prod-price" required placeholder="29.90" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                </div>
+                <div>
+                    <label class="block font-bold text-primary mb-1">Categoria</label>
+                    <select id="prod-cat" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary">
+                        <option value="Fit">Fit</option>
+                        <option value="Low Carb">Low Carb</option>
+                        <option value="Sopas">Sopas & Cremes</option>
+                        <option value="Sobremesas">Sobremesas Fit</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Badge (Insignia)</label>
+                <input type="text" id="prod-badge" placeholder="Ex: Fit & Proteico" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            
+            <!-- Image Selection: URL or Upload from Device -->
+            <div>
+                <label class="block font-bold text-primary mb-1">Imagem do Prato</label>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <label class="cursor-pointer bg-surface-container hover:bg-surface-container-high text-primary font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-outline-variant/30 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-sm">upload_file</span> Carregar Foto do Dispositivo
+                            <input type="file" id="prod-file-input" accept="image/*" class="hidden" onchange="handleDeviceFileUpload(event)">
+                        </label>
+                    </div>
+                    <p class="text-[10px] text-on-surface-variant">ou informe a URL da foto:</p>
+                    <input type="text" id="prod-img" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" oninput="updateImagePreview(this.value)" />
+                    
+                    <!-- Image Preview -->
+                    <div id="image-preview-container" class="h-28 rounded-xl overflow-hidden hidden border border-outline-variant/30 relative mt-2">
+                        <img id="image-preview-img" class="w-full h-full object-cover" src="" alt="Prévia"/>
+                        <span class="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-2 py-0.5 rounded font-bold">Prévia da Foto</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" id="prod-highlight" class="rounded text-primary border-outline-variant" />
+                <label for="prod-highlight" class="font-bold text-primary">Destacar na Capa do Cardápio</label>
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all shadow-md mt-4" id="prod-submit-btn">
+                Salvar Prato no Supabase
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Add / Edit Category Modal -->
+<div class="fixed inset-0 bg-black/60 z-[120] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="category-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-outline-variant/30 relative">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeCategoryModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1" id="cat-modal-title">Cadastrar Categoria</h3>
+        <p class="text-xs text-on-surface-variant mb-4">Adiciona ou edita categorias no Supabase</p>
+
+        <form onsubmit="handleCategorySubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="cat-id" value="" />
+            <div>
+                <label class="block font-bold text-primary mb-1">Nome da Categoria</label>
+                <input type="text" id="cat-name" required placeholder="Ex: Sopas & Cremes" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Slug (Identificador)</label>
+                <input type="text" id="cat-slug" required placeholder="ex: sopas" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Ícone (Material Symbol)</label>
+                <input type="text" id="cat-icon" placeholder="soup_kitchen, restaurant, eco..." class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Descrição</label>
+                <input type="text" id="cat-desc" placeholder="Breve descrição da categoria..." class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all shadow-md mt-4">
+                Salvar Categoria
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Add / Edit Coupon Modal -->
+<div class="fixed inset-0 bg-black/60 z-[120] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="coupon-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-outline-variant/30 relative">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeCouponModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1" id="coup-modal-title">Cadastrar Cupom de Desconto</h3>
+        <p class="text-xs text-on-surface-variant mb-4">Configura um novo código de cupom para os clientes</p>
+
+        <form onsubmit="handleCouponSubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="coup-id" value="" />
+            <div>
+                <label class="block font-bold text-primary mb-1">Código do Cupom</label>
+                <input type="text" id="coup-code" required placeholder="Ex: LISE10" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold uppercase focus:outline-none focus:border-primary" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-primary mb-1">Tipo de Desconto</label>
+                    <select id="coup-type" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary">
+                        <option value="percentage">Porcentagem (%)</option>
+                        <option value="fixed">Valor Fixo (R$)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-primary mb-1">Valor do Desconto</label>
+                    <input type="number" step="0.01" id="coup-value" required placeholder="10.00" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-primary mb-1">Pedido Mínimo (R$)</label>
+                <input type="number" step="0.01" id="coup-min" placeholder="50.00" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" id="coup-active" checked class="rounded text-primary border-outline-variant" />
+                <label for="coup-active" class="font-bold text-primary">Cupom Ativo para Uso</label>
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all shadow-md mt-4">
+                Salvar Cupom
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    let adminOrders = [];
+    let adminProducts = [];
+    let adminCategories = [];
+    let adminCoupons = [];
+
+    function checkAdminAuthView() {
+        const loginScreen = document.getElementById('admin-login-screen');
+        const appLayout = document.getElementById('admin-app-layout');
+        const currentAdmin = getCurrentAdmin();
+
+        if (!currentAdmin) {
+            loginScreen.classList.remove('hidden');
+            appLayout.classList.add('hidden');
+        } else {
+            loginScreen.classList.add('hidden');
+            appLayout.classList.remove('hidden');
+            const displayEl = document.getElementById('admin-user-display');
+            if (displayEl) displayEl.innerText = currentAdmin.name || 'Admin';
+            loadAdminData();
+        }
+    }
+
+    async function handleAdminLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('admin-login-email').value;
+        const pass = document.getElementById('admin-login-password').value;
+
+        const res = await loginAdminInSupabase(email, pass);
+        if (res) {
+            showToast(`Bem-vindo, ${res.name}!`, 'success');
+            checkAdminAuthView();
+        } else {
+            alert('E-mail ou senha incorretos! Tente novamente.');
+        }
+    }
+
+    function switchAdminTab(tabId, btnEl) {
+        document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+            btn.classList.remove('bg-white/10', 'text-white');
+            btn.classList.add('text-white/80');
+        });
+
+        const target = document.getElementById('tab-' + tabId);
+        if (target) target.classList.remove('hidden');
+
+        if (btnEl) {
+            btnEl.classList.remove('text-white/80');
+            btnEl.classList.add('bg-white/10', 'text-white');
+        }
+
+        const titles = {
+            'overview': 'Visão Geral & Indicadores',
+            'orders': 'Gestão de Pedidos en Tempo Real',
+            'products': 'Gerenciamento do Cardápio',
+            'categories': 'Gestão de Categorias',
+            'coupons': 'Gestão de Cupons de Desconto',
+            'customers': 'Clientes Cadastrados',
+            'reviews': 'Gestão de Avaliações',
+            'admins': 'Configurações & Administradores'
+        };
+        document.getElementById('admin-tab-title').innerText = titles[tabId] || 'Painel de Gerenciamento';
+    }
+
+    async function loadAdminData() {
+        // Parallel data loading for maximum speed & instant realtime sync
+        const [
+            ordersRes,
+            productsRes,
+            categoriesRes,
+            couponsRes,
+            customersRes,
+            reviewsRes,
+            adminsRes,
+            whatsappRes
+        ] = await Promise.allSettled([
+            typeof fetchAllOrdersForAdmin === 'function' ? fetchAllOrdersForAdmin() : Promise.resolve([]),
+            typeof fetchProductsFromSupabase === 'function' ? fetchProductsFromSupabase() : Promise.resolve([]),
+            typeof fetchCategoriesFromSupabase === 'function' ? fetchCategoriesFromSupabase() : Promise.resolve([]),
+            typeof fetchCouponsFromSupabase === 'function' ? fetchCouponsFromSupabase() : Promise.resolve([]),
+            typeof fetchAllProfilesForAdmin === 'function' ? fetchAllProfilesForAdmin() : Promise.resolve([]),
+            typeof fetchReviewsFromSupabase === 'function' ? fetchReviewsFromSupabase() : Promise.resolve([]),
+            typeof fetchAllAdminsFromSupabase === 'function' ? fetchAllAdminsFromSupabase() : Promise.resolve([]),
+            typeof fetchWhatsAppNumberFromSupabase === 'function' ? fetchWhatsAppNumberFromSupabase() : Promise.resolve('554898591226')
+        ]);
+
+        adminOrders = (ordersRes.status === 'fulfilled' && ordersRes.value) ? ordersRes.value : [];
+        renderAdminOrders();
+
+        adminProducts = (productsRes.status === 'fulfilled' && productsRes.value) ? productsRes.value : [];
+        renderAdminProducts();
+
+        adminCategories = (categoriesRes.status === 'fulfilled' && categoriesRes.value) ? categoriesRes.value : [];
+        renderAdminCategories();
+
+        adminCoupons = (couponsRes.status === 'fulfilled' && couponsRes.value) ? couponsRes.value : [];
+        renderAdminCoupons();
+
+        const customers = (customersRes.status === 'fulfilled' && customersRes.value) ? customersRes.value : [];
+        renderAdminCustomers(customers);
+
+        const reviews = (reviewsRes.status === 'fulfilled' && reviewsRes.value) ? reviewsRes.value : [];
+        renderAdminReviews(reviews);
+
+        const admins = (adminsRes.status === 'fulfilled' && adminsRes.value) ? adminsRes.value : [];
+        renderAdminList(admins);
+
+        if (whatsappRes.status === 'fulfilled' && whatsappRes.value) {
+            const input = document.getElementById('admin-whatsapp-number');
+            if (input) input.value = whatsappRes.value;
+        }
+
+        // Update Overview Metrics
+        const totalRevenue = adminOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+        const activeCount = adminOrders.filter(o => ['pending', 'confirmed', 'cooking', 'delivering'].includes(o.status)).length;
+
+        document.getElementById('metric-revenue').innerText = `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`;
+        document.getElementById('metric-active-orders').innerText = activeCount;
+        document.getElementById('metric-customers').innerText = customers.length;
+        document.getElementById('metric-products').innerText = adminProducts.length;
+    }
+
+    async function handleSaveWhatsAppNumber(e) {
+        e.preventDefault();
+        const input = document.getElementById('admin-whatsapp-number');
+        if (!input) return;
+        const val = input.value;
+
+        if (typeof updateWhatsAppNumberInSupabase === 'function') {
+            const ok = await updateWhatsAppNumberInSupabase(val);
+            if (ok) {
+                showToast('Número de WhatsApp atualizado no Supabase!', 'success');
+            } else {
+                alert('Erro ao salvar número de WhatsApp.');
+            }
+        }
+    }
+
+    function renderAdminOrders() {
+        const overviewBody = document.getElementById('overview-orders-table');
+        const fullBody = document.getElementById('full-orders-table');
+
+        if (!adminOrders || adminOrders.length === 0) {
+            const emptyHTML = `<tr><td colspan="6" class="py-6 text-center text-on-surface-variant italic">Nenhum pedido registrado até o momento.</td></tr>`;
+            if (overviewBody) overviewBody.innerHTML = emptyHTML;
+            if (fullBody) fullBody.innerHTML = emptyHTML;
+            return;
+        }
+
+        const renderRows = (limit = null) => {
+            const list = limit ? adminOrders.slice(0, limit) : adminOrders;
+            return list.map(o => `
+                <tr class="hover:bg-surface-container/50">
+                    <td class="py-3 px-3 font-bold text-primary">${o.code}</td>
+                    <td class="py-3 px-3">
+                        <span class="font-bold text-primary block">${o.customer_name}</span>
+                        <span class="text-[11px] text-on-surface-variant">${o.customer_phone}</span>
+                    </td>
+                    <td class="py-3 px-3 text-on-surface-variant max-w-xs truncate">${o.delivery_address}</td>
+                    <td class="py-3 px-3 font-bold text-primary">R$ ${parseFloat(o.total_amount).toFixed(2).replace('.', ',')}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusBadgeClass(o.status)}">
+                            ${getStatusLabel(o.status)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="inline-flex gap-1">
+                            <button onclick="changeOrderStatus('${o.id}', 'cooking')" title="Cozinha" class="px-2 py-1 bg-amber-100 text-amber-800 rounded font-bold hover:bg-amber-200">Cozinha</button>
+                            <button onclick="changeOrderStatus('${o.id}', 'delivering')" title="Entrega" class="px-2 py-1 bg-blue-100 text-blue-800 rounded font-bold hover:bg-blue-200">Entrega</button>
+                            <button onclick="changeOrderStatus('${o.id}', 'delivered')" title="Concluído" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold hover:bg-emerald-200">Concluído</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        if (overviewBody) overviewBody.innerHTML = renderRows(5);
+        if (fullBody) fullBody.innerHTML = renderRows();
+    }
+
+    function getStatusBadgeClass(status) {
+        switch (status) {
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'confirmed': return 'bg-blue-100 text-blue-800';
+            case 'cooking': return 'bg-amber-100 text-amber-800';
+            case 'delivering': return 'bg-purple-100 text-purple-800';
+            case 'delivered': return 'bg-emerald-100 text-emerald-800';
+            case 'cancelled': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getStatusLabel(status) {
+        switch (status) {
+            case 'pending': return 'Pendente';
+            case 'confirmed': return 'Confirmado';
+            case 'cooking': return 'Cozinha';
+            case 'delivering': return 'Saiu p/ Entrega';
+            case 'delivered': return 'Entregue';
+            case 'cancelled': return 'Cancelado';
+            default: return status;
+        }
+    }
+
+    async function changeOrderStatus(orderId, newStatus) {
+        if (typeof updateOrderStatusInSupabase === 'function') {
+            const ok = await updateOrderStatusInSupabase(orderId, newStatus);
+            if (ok) {
+                showToast(`Status atualizado para ${getStatusLabel(newStatus)}!`, 'success');
+                loadAdminData();
+            }
+        }
+    }
+
+    function renderAdminProducts() {
+        const grid = document.getElementById('admin-products-grid');
+        if (!grid) return;
+
+        if (adminProducts.length === 0) {
+            grid.innerHTML = '<p class="text-xs text-on-surface-variant italic col-span-full">Nenhum prato cadastrado.</p>';
+            return;
+        }
+
+        grid.innerHTML = adminProducts.map(p => `
+            <div class="bg-surface-container-lowest p-4 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+                <div>
+                    <div class="h-36 rounded-xl overflow-hidden mb-3 relative">
+                        <img src="${p.image_url}" class="w-full h-full object-cover"/>
+                        <span class="absolute top-2 left-2 bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">${p.category_slug}</span>
+                        ${p.is_highlight ? '<span class="absolute top-2 right-2 bg-secondary text-white text-[9px] px-2 py-0.5 rounded-full font-bold">Destaque</span>' : ''}
+                    </div>
+                    <h4 class="font-bold text-primary text-sm mb-1">${p.name}</h4>
+                    <p class="text-[11px] text-on-surface-variant line-clamp-2 mb-3">${p.description}</p>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+                    <span class="font-bold text-primary text-base">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="openEditProductModal('${p.id}')" class="text-primary hover:bg-surface-container px-2.5 py-1.5 rounded-xl transition-colors font-bold text-xs flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">edit</span> Editar
+                        </button>
+                        <button onclick="handleDeleteProduct('${p.id}')" class="text-red-600 hover:bg-red-50 px-2 py-1.5 rounded-xl transition-colors font-bold text-xs flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderAdminCategories() {
+        const body = document.getElementById('admin-categories-table');
+        if (!body) return;
+
+        if (adminCategories.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-on-surface-variant italic font-bold">Nenhuma categoria cadastrada no momento. Clique em "Nova Categoria" para adicionar.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = adminCategories.map(c => `
+            <tr class="hover:bg-surface-container/50">
+                <td class="py-3 px-3"><span class="material-symbols-outlined text-primary">${c.icon_name || 'restaurant'}</span></td>
+                <td class="py-3 px-3 font-bold text-primary">${c.name}</td>
+                <td class="py-3 px-3 text-on-surface-variant font-mono">${c.slug}</td>
+                <td class="py-3 px-3 text-on-surface-variant max-w-xs truncate">${c.description || '--'}</td>
+                <td class="py-3 px-3 text-right">
+                    <div class="inline-flex gap-1">
+                        <button onclick="openEditCategoryModal('${c.id}')" class="text-primary hover:bg-surface-container px-2 py-1 rounded font-bold text-xs">Editar</button>
+                        <button onclick="handleDeleteCategory('${c.id}')" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold text-xs">Excluir</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderAdminCoupons() {
+        const body = document.getElementById('admin-coupons-table');
+        if (!body) return;
+
+        if (adminCoupons.length === 0) {
+            body.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-on-surface-variant italic font-bold">Nenhum cupom de desconto cadastrado no momento. Clique em "Criar Novo Cupom" para adicionar.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = adminCoupons.map(cp => {
+            const valStr = cp.discount_type === 'percentage' ? `${cp.discount_value}%` : `R$ ${parseFloat(cp.discount_value).toFixed(2).replace('.', ',')}`;
+            const minStr = cp.min_order_amount > 0 ? `R$ ${parseFloat(cp.min_order_amount).toFixed(2).replace('.', ',')}` : 'Sem mínimo';
+
+            return `
+                <tr class="hover:bg-surface-container/50">
+                    <td class="py-3 px-3 font-bold text-primary uppercase font-mono">${cp.code}</td>
+                    <td class="py-3 px-3 text-on-surface-variant">${cp.discount_type === 'percentage' ? 'Porcentagem' : 'Valor Fixo'}</td>
+                    <td class="py-3 px-3 font-bold text-emerald-700">${valStr}</td>
+                    <td class="py-3 px-3 text-on-surface-variant">${minStr}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${cp.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                            ${cp.is_active ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="inline-flex gap-1">
+                            <button onclick="openEditCouponModal('${cp.id}')" class="text-primary hover:bg-surface-container px-2 py-1 rounded font-bold text-xs">Editar</button>
+                            <button onclick="handleDeleteCoupon('${cp.id}')" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold text-xs">Excluir</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function handleDeleteProduct(id) {
+        if (confirm("Deseja realmente remover este prato do Supabase?")) {
+            const ok = await deleteProductInSupabase(id);
+            if (ok) {
+                showToast('Prato removido!');
+                loadAdminData();
+            }
+        }
+    }
+
+    async function handleDeleteCategory(id) {
+        if (confirm("Remover esta categoria do Supabase?")) {
+            const ok = await deleteCategoryInSupabase(id);
+            if (ok) {
+                showToast('Categoria removida!');
+                loadAdminData();
+            }
+        }
+    }
+
+    async function handleDeleteCoupon(id) {
+        if (confirm("Remover este cupom do Supabase?")) {
+            const ok = await deleteCouponInSupabase(id);
+            if (ok) {
+                showToast('Cupom removido!');
+                loadAdminData();
+            }
+        }
+    }
+
+    function renderAdminCustomers(customers) {
+        const body = document.getElementById('admin-customers-table');
+        if (!body) return;
+
+        if (customers.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-on-surface-variant italic">Nenhum cliente cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = customers.map(c => `
+            <tr class="hover:bg-surface-container/50">
+                <td class="py-3 px-3 font-bold text-primary">${c.name}</td>
+                <td class="py-3 px-3 text-on-surface-variant">${c.phone || '--'}</td>
+                <td class="py-3 px-3 text-on-surface-variant">${c.email}</td>
+                <td class="py-3 px-3"><span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">Ativo</span></td>
+                <td class="py-3 px-3 text-on-surface-variant text-[11px]">${new Date(c.created_at || Date.now()).toLocaleDateString('pt-BR')}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderAdminReviews(reviews) {
+        const grid = document.getElementById('admin-reviews-grid');
+        if (!grid) return;
+
+        if (reviews.length === 0) {
+            grid.innerHTML = '<p class="text-xs text-on-surface-variant italic col-span-full">Nenhuma avaliação recebida.</p>';
+            return;
+        }
+
+        grid.innerHTML = reviews.map(r => `
+            <div class="bg-surface-container-lowest p-5 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-primary text-sm">${r.customer_name}</span>
+                        <span class="text-secondary font-bold text-xs">${'★'.repeat(r.rating)}</span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant mb-4">"${r.comment}"</p>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-outline-variant/20">
+                    <span class="text-[10px] text-on-surface-variant">${new Date(r.created_at || Date.now()).toLocaleDateString('pt-BR')}</span>
+                    <button onclick="handleDeleteReview('${r.id}')" class="text-red-600 hover:bg-red-50 p-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">delete</span> Excluir
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function handleDeleteReview(id) {
+        if (confirm("Remover esta avaliação do Supabase?")) {
+            const ok = await deleteReviewInSupabase(id);
+            if (ok) {
+                showToast('Avaliação removida!');
+                loadAdminData();
+            }
+        }
+    }
+
+    function renderAdminList(admins) {
+        const body = document.getElementById('admins-list-table');
+        if (!body) return;
+
+        if (admins.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-on-surface-variant italic">Nenhum administrador encontrado.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = admins.map(a => `
+            <tr class="hover:bg-surface-container/50">
+                <td class="py-3 px-3 font-bold text-primary">${a.name}</td>
+                <td class="py-3 px-3 text-on-surface-variant">${a.email}</td>
+                <td class="py-3 px-3"><span class="bg-secondary/10 text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">${a.role || 'Admin'}</span></td>
+                <td class="py-3 px-3 text-on-surface-variant text-[11px]">${new Date(a.created_at || Date.now()).toLocaleDateString('pt-BR')}</td>
+                <td class="py-3 px-3 text-right">
+                    ${a.email !== 'admin@lisecozinha.com.br' ? `
+                        <button onclick="handleDeleteAdmin('${a.id}')" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold text-xs">Excluir</button>
+                    ` : '<span class="text-[10px] text-on-surface-variant italic">Mestre</span>'}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function handleCreateAdminSubmit(e) {
+        e.preventDefault();
+        const name = document.getElementById('admin-new-name').value;
+        const email = document.getElementById('admin-new-email').value;
+        const pass = document.getElementById('admin-new-pass').value;
+
+        const res = await createAdminInSupabase(name, email, pass);
+        if (res) {
+            showToast(`Administrador "${name}" criado com sucesso!`, 'success');
+            document.getElementById('admin-new-name').value = '';
+            document.getElementById('admin-new-email').value = '';
+            document.getElementById('admin-new-pass').value = '';
+            loadAdminData();
+        } else {
+            alert('Erro ao criar administrador no Supabase.');
+        }
+    }
+
+    async function handleDeleteAdmin(adminId) {
+        if (confirm("Deseja realmente revogar o acesso deste administrador?")) {
+            const ok = await deleteAdminFromSupabase(adminId);
+            if (ok) {
+                showToast('Administrador removido!');
+                loadAdminData();
+            }
+        }
+    }
+
+    // Category Modal functions
+    function openNewCategoryModal() {
+        document.getElementById('cat-id').value = '';
+        document.getElementById('cat-modal-title').innerText = 'Cadastrar Categoria';
+        document.getElementById('cat-name').value = '';
+        document.getElementById('cat-slug').value = '';
+        document.getElementById('cat-icon').value = 'restaurant';
+        document.getElementById('cat-desc').value = '';
+
+        const modal = document.getElementById('category-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function openEditCategoryModal(catId) {
+        const cat = adminCategories.find(c => c.id === catId);
+        if (!cat) return;
+
+        document.getElementById('cat-id').value = cat.id;
+        document.getElementById('cat-modal-title').innerText = 'Editar Categoria';
+        document.getElementById('cat-name').value = cat.name;
+        document.getElementById('cat-slug').value = cat.slug;
+        document.getElementById('cat-icon').value = cat.icon_name || 'restaurant';
+        document.getElementById('cat-desc').value = cat.description || '';
+
+        const modal = document.getElementById('category-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeCategoryModal() {
+        const modal = document.getElementById('category-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function handleCategorySubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('cat-id').value;
+        const name = document.getElementById('cat-name').value;
+        const slug = document.getElementById('cat-slug').value;
+        const icon = document.getElementById('cat-icon').value;
+        const desc = document.getElementById('cat-desc').value;
+
+        const catData = { name, slug, icon_name: icon, description: desc };
+        let res = id ? await updateCategoryInSupabase(id, catData) : await addCategoryInSupabase(catData);
+
+        if (res && res.length > 0) {
+            closeCategoryModal();
+            showToast(id ? `Categoria "${name}" atualizada!` : `Categoria "${name}" criada com sucesso!`, 'success');
+            loadAdminData();
+        } else {
+            alert('Erro ao salvar categoria no Supabase. Verifique se o slug ou nome já existe.');
+        }
+    }
+
+    // Coupon Modal functions
+    function openNewCouponModal() {
+        document.getElementById('coup-id').value = '';
+        document.getElementById('coup-modal-title').innerText = 'Cadastrar Cupom de Desconto';
+        document.getElementById('coup-code').value = '';
+        document.getElementById('coup-type').value = 'percentage';
+        document.getElementById('coup-value').value = '';
+        document.getElementById('coup-min').value = '0';
+        document.getElementById('coup-active').checked = true;
+
+        const modal = document.getElementById('coupon-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function openEditCouponModal(coupId) {
+        const coup = adminCoupons.find(cp => cp.id === coupId);
+        if (!coup) return;
+
+        document.getElementById('coup-id').value = coup.id;
+        document.getElementById('coup-modal-title').innerText = 'Editar Cupom de Desconto';
+        document.getElementById('coup-code').value = coup.code;
+        document.getElementById('coup-type').value = coup.discount_type || 'percentage';
+        document.getElementById('coup-value').value = coup.discount_value;
+        document.getElementById('coup-min').value = coup.min_order_amount || 0;
+        document.getElementById('coup-active').checked = !!coup.is_active;
+
+        const modal = document.getElementById('coupon-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeCouponModal() {
+        const modal = document.getElementById('coupon-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function handleCouponSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('coup-id').value;
+        const code = document.getElementById('coup-code').value;
+        const type = document.getElementById('coup-type').value;
+        const value = document.getElementById('coup-value').value;
+        const min = document.getElementById('coup-min').value;
+        const active = document.getElementById('coup-active').checked;
+
+        const coupData = { code, discount_type: type, discount_value: value, min_order_amount: min, is_active: active };
+        let res = id ? await updateCouponInSupabase(id, coupData) : await addCouponInSupabase(coupData);
+
+        if (res) {
+            closeCouponModal();
+            showToast(id ? `Cupom "${code}" atualizado!` : `Cupom "${code}" criado!`, 'success');
+            loadAdminData();
+        } else {
+            alert('Erro ao salvar cupom no Supabase.');
+        }
+    }
+
+    function openNewProductModal() {
+        document.getElementById('prod-id').value = '';
+        document.getElementById('prod-modal-title').innerText = 'Cadastrar Novo Prato';
+        document.getElementById('prod-submit-btn').innerText = 'Salvar Prato no Supabase';
+        document.getElementById('prod-name').value = '';
+        document.getElementById('prod-desc').value = '';
+        document.getElementById('prod-price').value = '';
+        document.getElementById('prod-cat').value = 'Fit';
+        document.getElementById('prod-badge').value = 'Fit & Proteico';
+        document.getElementById('prod-img').value = '';
+        document.getElementById('prod-highlight').checked = false;
+        document.getElementById('image-preview-container').classList.add('hidden');
+
+        const modal = document.getElementById('new-product-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function openEditProductModal(productId) {
+        const prod = adminProducts.find(p => p.id === productId);
+        if (!prod) return;
+
+        document.getElementById('prod-id').value = prod.id;
+        document.getElementById('prod-modal-title').innerText = 'Editar Prato';
+        document.getElementById('prod-submit-btn').innerText = 'Atualizar Prato no Supabase';
+        document.getElementById('prod-name').value = prod.name;
+        document.getElementById('prod-desc').value = prod.description;
+        document.getElementById('prod-price').value = prod.price;
+        document.getElementById('prod-cat').value = prod.category_slug || 'Fit';
+        document.getElementById('prod-badge').value = prod.badge || '';
+        document.getElementById('prod-img').value = prod.image_url || '';
+        document.getElementById('prod-highlight').checked = !!prod.is_highlight;
+
+        updateImagePreview(prod.image_url);
+
+        const modal = document.getElementById('new-product-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeNewProductModal() {
+        const modal = document.getElementById('new-product-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function handleDeviceFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Data = e.target.result;
+            document.getElementById('prod-img').value = base64Data;
+            updateImagePreview(base64Data);
+            showToast('Foto carregada do dispositivo!', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function updateImagePreview(url) {
+        const container = document.getElementById('image-preview-container');
+        const img = document.getElementById('image-preview-img');
+        if (url && url.length > 5) {
+            img.src = url;
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+
+    async function handleProductSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('prod-id').value;
+        const name = document.getElementById('prod-name').value;
+        const desc = document.getElementById('prod-desc').value;
+        const price = document.getElementById('prod-price').value;
+        const cat = document.getElementById('prod-cat').value;
+        const badge = document.getElementById('prod-badge').value;
+        const img = document.getElementById('prod-img').value;
+        const highlight = document.getElementById('prod-highlight').checked;
+
+        const productData = {
+            name,
+            description: desc,
+            price,
+            category_slug: cat,
+            badge: badge || cat,
+            image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+            is_highlight: highlight
+        };
+
+        let res = false;
+        if (id) {
+            res = await updateProductInSupabase(id, productData);
+        } else {
+            res = await addProductInSupabase(productData);
+        }
+
+        if (res) {
+            closeNewProductModal();
+            showToast(id ? `Prato "${name}" atualizado!` : `Prato "${name}" cadastrado!`, 'success');
+            loadAdminData();
+        } else {
+            alert('Erro ao salvar prato no Supabase.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAdminAuthView();
+        if (typeof subscribeToOrdersRealtime === 'function') {
+            subscribeToOrdersRealtime(() => {
+                if (isAdminLoggedIn()) loadAdminData();
+            });
+        }
+    });
+</script>
+</body>
+</html>

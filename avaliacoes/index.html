@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>Avaliações & Depoimentos | Lise Cozinha Fit</title>
+    <meta name="description" content="Confira o que nossos clientes dizem sobre as marmitas fit da Lise Cozinha. Avaliações reais e nota 4.9 no Google." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Anti-FOUT: Hide raw ligature text before font loads */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            opacity: 0;
+            transition: opacity 0.15s ease-in;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .fonts-loaded .material-symbols-outlined {
+            opacity: 1;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(27, 67, 50, 0.08);
+        }
+    </style>
+    <script>
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                document.documentElement.classList.add('fonts-loaded');
+            });
+            setTimeout(() => document.documentElement.classList.add('fonts-loaded'), 300);
+        } else {
+            document.documentElement.classList.add('fonts-loaded');
+        }
+    </script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#012d1d",
+                        "primary-container": "#1b4332",
+                        "on-primary-container": "#86af99",
+                        "secondary": "#904d00",
+                        "secondary-container": "#fe932c",
+                        "tertiary": "#242624",
+                        "tertiary-container": "#3a3c39",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#414844",
+                        "outline-variant": "#c1c8c2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "price-display": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-28">
+
+<!-- Header Top Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0px_4px_20px_rgba(27,67,50,0.08)]">
+    <div class="flex justify-between items-center px-4 md:px-8 h-16 w-full max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-150 md:hidden" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
+                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+            </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="/" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Início</a>
+            <a href="/cardapio" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Cardápio</a>
+            <a href="/pedidos" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Meus Pedidos</a>
+            <a href="/avaliacoes" class="text-sm font-label-md text-primary font-bold hover:text-primary transition-colors">Avaliações</a>
+            <a href="/perfil" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Perfil</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+            <button class="relative material-symbols-outlined text-primary p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-150" onclick="toggleCart()">
+                shopping_bag
+                <span class="cart-badge-count absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation Drawer -->
+<div class="fixed inset-0 bg-black/50 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed top-0 left-0 h-full w-72 bg-surface z-[70] transform -translate-x-full shadow-2xl transition-transform duration-300 flex flex-col" id="nav-drawer">
+    <div class="p-6 border-b border-outline-variant/30 flex items-center justify-between">
+        <h2 class="font-headline-md text-primary font-bold text-lg">Menu Lise</h2>
+        <button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full" onclick="toggleDrawer()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-label-md">Início</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/cardapio">
+            <span class="material-symbols-outlined">restaurant_menu</span>
+            <span class="font-label-md">Cardápio Completo</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/pedidos">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span class="font-label-md">Meus Pedidos</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-semibold" href="/avaliacoes">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">reviews</span>
+            <span class="font-label-md">Avaliações</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/perfil">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label-md">Meu Perfil</span>
+        </a>
+        <button onclick="openAuthModal('register')" class="w-full mt-4 flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-bold text-xs font-label-md shadow-md active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-sm">person_add</span>
+            <span>Cadastrar / Entrar</span>
+        </button>
+    </nav>
+</aside>
+
+<main class="pt-24 px-4 md:px-8 max-w-7xl mx-auto">
+    <!-- Summary Header -->
+    <section class="mb-10 flex flex-col md:flex-row items-center gap-6 bg-surface-container-lowest p-6 md:p-8 rounded-2xl organic-shadow border border-outline-variant/30">
+        <div class="flex-1 text-center md:text-left">
+            <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-label-md font-bold uppercase tracking-wider mb-2 inline-block">Comunidade Lise</span>
+            <h2 class="font-headline-lg text-2xl md:text-4xl font-bold text-primary mb-2">O que dizem sobre nós</h2>
+            <p class="text-on-surface-variant text-sm md:text-base max-w-xl">Sua saúde e satisfação são nossa maior conquista. Veja o depoimento real de quem transformou a rotina com a Lise Cozinha.</p>
+        </div>
+        <div class="flex flex-col items-center justify-center p-6 bg-primary-container rounded-2xl text-on-primary-container w-full md:w-56 text-center shadow-md">
+            <span class="text-4xl md:text-5xl font-bold font-headline-xl">4.9</span>
+            <div class="flex gap-1 my-2 text-secondary-container">
+                <span class="material-symbols-outlined fill">star</span>
+                <span class="material-symbols-outlined fill">star</span>
+                <span class="material-symbols-outlined fill">star</span>
+                <span class="material-symbols-outlined fill">star</span>
+                <span class="material-symbols-outlined fill">star_half</span>
+            </div>
+            <span class="font-label-md text-xs">Mais de 450 avaliações</span>
+            <button class="mt-4 bg-secondary text-white text-xs font-label-md font-bold px-4 py-2 rounded-full hover:scale-105 transition-transform" onclick="openReviewModal()">Avaliar Minha Experiência</button>
+        </div>
+    </section>
+
+    <!-- Reviews Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" id="reviews-container">
+        
+        <!-- Featured Review -->
+        <article class="md:col-span-2 bg-surface-container-lowest p-6 md:p-8 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-secondary fill">verified</span>
+                    <span class="font-label-md text-xs font-bold text-primary uppercase tracking-wider">Depoimento em Destaque</span>
+                </div>
+                <p class="font-body-lg text-base md:text-lg italic text-on-surface mb-6">"A Lise Cozinha mudou minha relação com comida congelada. O tempero é verdadeiramente caseiro, os ingredientes são frescos e o sabor é surpreendente para uma dieta low carb. Recomendo de olhos fechados!"</p>
+            </div>
+            <div class="flex items-center justify-between border-t border-outline-variant/20 pt-4">
+                <div>
+                    <h4 class="font-headline-md font-bold text-primary text-base">Mariana Silva</h4>
+                    <p class="text-on-surface-variant text-xs font-label-md">Nutricionista & Cliente Frequente</p>
+                </div>
+                <div class="flex text-secondary font-bold text-sm">
+                    ★★★★★
+                </div>
+            </div>
+        </article>
+
+        <!-- Review Card 1 -->
+        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+            <div>
+                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
+                <p class="text-on-surface-variant text-sm mb-4">"Praticidade e sabor imbatíveis! O Escondidinho de Carne com Couve-Flor é sensacional. Perfeito para quem tem dias áridos no trabalho."</p>
+            </div>
+            <div class="border-t border-outline-variant/20 pt-3">
+                <h4 class="font-label-md font-bold text-primary text-sm">Ricardo Torres</h4>
+                <p class="text-on-surface-variant text-[11px]">Cliente desde Jan 2024</p>
+            </div>
+        </article>
+
+        <!-- Review Card 2 -->
+        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+            <div>
+                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
+                <p class="text-on-surface-variant text-sm mb-4">"Entregas sempre pontuais em Armazém/SC. Marmitas muito bem embaladas e esquentam por igual no micro-ondas."</p>
+            </div>
+            <div class="border-t border-outline-variant/20 pt-3">
+                <h4 class="font-label-md font-bold text-primary text-sm">Juliana Alencar</h4>
+                <p class="text-on-surface-variant text-[11px]">Pediu 8 veces</p>
+            </div>
+        </article>
+
+        <!-- Review Card 3 -->
+        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+            <div>
+                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
+                <p class="text-on-surface-variant text-sm mb-4">"A Sopa de Abóbora com Gengibre é um abraço quentinho à noite. Comida leve e super nutritiva."</p>
+            </div>
+            <div class="border-t border-outline-variant/20 pt-3">
+                <h4 class="font-label-md font-bold text-primary text-sm">Felipe Martins</h4>
+                <p class="text-on-surface-variant text-[11px]">Atleta Amador</p>
+            </div>
+        </article>
+
+        <!-- Review Card 4 -->
+        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+            <div>
+                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
+                <p class="text-on-surface-variant text-sm mb-4">"O brownie proteico de cacau 70% tirou minha vontade de doces sem estragar a dieta. Perfeito!"</p>
+            </div>
+            <div class="border-t border-outline-variant/20 pt-3">
+                <h4 class="font-label-md font-bold text-primary text-sm">Beatriz Souza</h4>
+                <p class="text-on-surface-variant text-[11px]">Cliente Verificada</p>
+            </div>
+        </article>
+
+    </section>
+</main>
+
+<!-- Add Review Modal -->
+<div class="fixed inset-0 bg-black/50 z-[80] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="review-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/30 relative">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeReviewModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1">Deixar sua Avaliação</h3>
+        <p class="text-on-surface-variant text-xs mb-4">Conte sua experiência com a Lise Cozinha</p>
+
+        <form id="review-form" onsubmit="submitReview(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Seu Nome</label>
+                <input type="text" id="rev-name" required placeholder="Ex: Maria Santos" class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Sua Nota</label>
+                <div class="flex gap-2 text-2xl text-outline-variant cursor-pointer" id="star-picker">
+                    <span onclick="setRating(1)" class="material-symbols-outlined star-icon hover:text-secondary">star</span>
+                    <span onclick="setRating(2)" class="material-symbols-outlined star-icon hover:text-secondary">star</span>
+                    <span onclick="setRating(3)" class="material-symbols-outlined star-icon hover:text-secondary">star</span>
+                    <span onclick="setRating(4)" class="material-symbols-outlined star-icon hover:text-secondary">star</span>
+                    <span onclick="setRating(5)" class="material-symbols-outlined star-icon hover:text-secondary">star</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Seu Comentário</label>
+                <textarea id="rev-comment" required rows="3" placeholder="O que você achou dos pratos e do atendimento?" class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-headline-md font-bold text-sm hover:bg-primary-container transition-colors shadow">Enviar Avaliação</button>
+        </form>
+    </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant/30 shadow-[0px_-4px_20px_rgba(27,67,50,0.05)] rounded-t-xl px-2 py-2 flex justify-between items-center pb-safe max-w-2xl left-1/2 -translate-x-1/2 md:hidden">
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/" data-nav="inicio">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-label-md">Início</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/cardapio" data-nav="cardapio">
+        <span class="material-symbols-outlined">restaurant_menu</span>
+        <span class="text-[10px] font-label-md">Cardápio</span>
+    </a>
+    <button class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1 relative" onclick="toggleCart()" data-nav="cart-toggle">
+        <div class="relative">
+            <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="cart-badge-count absolute -top-1 -right-2 bg-secondary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+        </div>
+        <span class="text-[10px] font-label-md">Carrinho</span>
+    </button>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/pedidos" data-nav="pedidos">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="text-[10px] font-label-md">Pedidos</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
+        <span class="material-symbols-outlined">reviews</span>
+        <span class="text-[10px] font-label-md">Avaliações</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/perfil" data-nav="perfil">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-label-md">Perfil</span>
+    </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    let selectedRating = 5;
+
+    async function loadReviewsFromSupabase() {
+        if (typeof fetchReviewsFromSupabase !== 'function') return;
+        const reviews = await fetchReviewsFromSupabase();
+        if (!reviews) return;
+
+        // Calculate statistics
+        if (reviews.length > 0) {
+            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+            const avg = (sum / reviews.length).toFixed(1);
+
+            const scoreEl = document.querySelector('section.mb-10 .font-headline-xl');
+            const countEl = document.querySelector('section.mb-10 .font-label-md');
+            if (scoreEl) scoreEl.innerText = avg;
+            if (countEl) countEl.innerText = `Mais de ${reviews.length} avaliações`;
+        }
+
+        const container = document.getElementById('reviews-container');
+        if (!container) return;
+
+        const featured = reviews.find(r => r.is_featured) || reviews[0];
+        const others = reviews.filter(r => r !== featured);
+
+        let html = '';
+
+        if (featured) {
+            html += `
+                <article class="md:col-span-2 bg-surface-container-lowest p-6 md:p-8 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-secondary fill">verified</span>
+                            <span class="font-label-md text-xs font-bold text-primary uppercase tracking-wider">Depoimento em Destaque</span>
+                        </div>
+                        <p class="font-body-lg text-base md:text-lg italic text-on-surface mb-6">"${featured.comment}"</p>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-outline-variant/20 pt-4">
+                        <div>
+                            <h4 class="font-headline-md font-bold text-primary text-base">${featured.customer_name}</h4>
+                            <p class="text-on-surface-variant text-xs font-label-md">${featured.customer_role || 'Cliente Frequente'}</p>
+                        </div>
+                        <div class="flex text-secondary font-bold text-sm">
+                            ${'★'.repeat(featured.rating)}
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        others.forEach(r => {
+            html += `
+                <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-secondary text-sm mb-3">${'★'.repeat(r.rating)}</div>
+                        <p class="text-on-surface-variant text-sm mb-4">"${r.comment}"</p>
+                    </div>
+                    <div class="border-t border-outline-variant/20 pt-3">
+                        <h4 class="font-label-md font-bold text-primary text-sm">${r.customer_name}</h4>
+                        <p class="text-on-surface-variant text-[11px]">${r.customer_role || 'Cliente Verificado'}</p>
+                    </div>
+                </article>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function setRating(rating) {
+        selectedRating = rating;
+        const stars = document.querySelectorAll('.star-icon');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('text-secondary', 'fill');
+                star.classList.remove('text-outline-variant');
+            } else {
+                star.classList.remove('text-secondary', 'fill');
+                star.classList.add('text-outline-variant');
+            }
+        });
+    }
+
+    function openReviewModal() {
+        const modal = document.getElementById('review-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        setRating(5);
+    }
+
+    function closeReviewModal() {
+        const modal = document.getElementById('review-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function submitReview(e) {
+        e.preventDefault();
+        const name = document.getElementById('rev-name').value;
+        const comment = document.getElementById('rev-comment').value;
+
+        if (typeof saveReviewToSupabase === 'function') {
+            await saveReviewToSupabase({
+                customer_name: name,
+                rating: selectedRating,
+                comment: comment
+            });
+        }
+
+        closeReviewModal();
+        showToast('Obrigado! Sua avaliação foi publicada com sucesso.');
+        document.getElementById('review-form').reset();
+        loadReviewsFromSupabase();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadReviewsFromSupabase();
+        if (typeof subscribeToReviewsRealtime === 'function') {
+            subscribeToReviewsRealtime(() => loadReviewsFromSupabase());
+        }
+    });
+</script>
+</body>
+</html>

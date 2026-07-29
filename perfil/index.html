@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>Meu Perfil | Lise Cozinha Fit</title>
+    <meta name="description" content="Gerencie seus dados pessoais, endereços de entrega e preferências alimentares na Lise Cozinha." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Anti-FOUT: Hide raw ligature text before font loads */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            opacity: 0;
+            transition: opacity 0.15s ease-in;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .fonts-loaded .material-symbols-outlined {
+            opacity: 1;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(27, 67, 50, 0.08);
+        }
+    </style>
+    <script>
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                document.documentElement.classList.add('fonts-loaded');
+            });
+            setTimeout(() => document.documentElement.classList.add('fonts-loaded'), 300);
+        } else {
+            document.documentElement.classList.add('fonts-loaded');
+        }
+    </script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#012d1d",
+                        "primary-container": "#1b4332",
+                        "on-primary-container": "#86af99",
+                        "secondary": "#904d00",
+                        "secondary-container": "#fe932c",
+                        "tertiary": "#242624",
+                        "tertiary-container": "#3a3c39",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#414844",
+                        "outline-variant": "#c1c8c2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "price-display": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-28">
+
+<!-- Header Top Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0px_4px_20px_rgba(27,67,50,0.08)]">
+    <div class="flex justify-between items-center px-4 md:px-8 h-16 w-full max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-150 md:hidden" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
+                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+            </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="/" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Início</a>
+            <a href="/cardapio" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Cardápio</a>
+            <a href="/pedidos" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Meus Pedidos</a>
+            <a href="/avaliacoes" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Avaliações</a>
+            <a href="/perfil" class="text-sm font-label-md text-primary font-bold hover:text-primary transition-colors">Perfil</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+            <button class="relative material-symbols-outlined text-primary p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-150" onclick="toggleCart()">
+                shopping_bag
+                <span class="cart-badge-count absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation Drawer -->
+<div class="fixed inset-0 bg-black/50 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed top-0 left-0 h-full w-72 bg-surface z-[70] transform -translate-x-full shadow-2xl transition-transform duration-300 flex flex-col" id="nav-drawer">
+    <div class="p-6 border-b border-outline-variant/30 flex items-center justify-between">
+        <h2 class="font-headline-md text-primary font-bold text-lg">Menu Lise</h2>
+        <button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full" onclick="toggleDrawer()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-label-md">Início</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/cardapio">
+            <span class="material-symbols-outlined">restaurant_menu</span>
+            <span class="font-label-md">Cardápio Completo</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/pedidos">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span class="font-label-md">Meus Pedidos</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/avaliacoes">
+            <span class="material-symbols-outlined">reviews</span>
+            <span class="font-label-md">Avaliações</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-semibold" href="/perfil">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-label-md">Meu Perfil</span>
+        </a>
+    </nav>
+</aside>
+
+<main class="pt-24 px-4 md:px-8 max-w-4xl mx-auto">
+    
+    <!-- Unauthenticated State Banner -->
+    <div id="unauth-profile-view" class="text-center py-16 px-6 bg-surface-container-lowest rounded-3xl organic-shadow border border-outline-variant/30 max-w-xl mx-auto my-8 hidden">
+        <div class="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
+            <span class="material-symbols-outlined text-4xl">account_circle</span>
+        </div>
+        <h3 class="font-headline-lg text-2xl font-bold text-primary mb-2">Acesse seu Perfil</h3>
+        <p class="text-on-surface-variant text-sm mb-6 max-w-md mx-auto">Para visualizar seus dados, cadastrar endereços e ver seu histórico de pedidos, faça login ou registre-se na Lise Cozinha.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onclick="openAuthModal('register')" class="bg-primary text-white font-bold px-6 py-3.5 rounded-xl text-sm font-label-md hover:bg-primary-container transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">person_add</span> Criar Conta Grátis
+            </button>
+            <button onclick="openAuthModal('login')" class="bg-surface-container hover:bg-surface-container-high text-primary font-bold px-6 py-3.5 rounded-xl text-sm font-label-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">login</span> Já tenho conta
+            </button>
+        </div>
+    </div>
+
+    <!-- Authenticated User Profile View -->
+    <div id="auth-profile-view" class="hidden">
+        <!-- Hero Profile Header -->
+        <section class="mb-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="relative">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary-container organic-shadow shadow-lg">
+                        <img class="w-full h-full object-cover" id="profile-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Avatar"/>
+                    </div>
+                    <button class="absolute bottom-0 right-0 bg-secondary text-white p-2 rounded-full shadow-lg hover:scale-105 transition-transform" onclick="showToast('Foto atualizada!')">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                    </button>
+                </div>
+                <div>
+                    <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-label-md font-bold inline-block mb-2" id="profile-vip-badge">Conta Verificada • Supabase Realtime</span>
+                    <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-primary" id="profile-name">Carregando...</h2>
+                    <p class="text-on-surface-variant text-sm" id="profile-location">Membro Ativo • Lise Cozinha Fit</p>
+                </div>
+            </div>
+
+            <!-- Account Actions: Logout -->
+            <div class="flex flex-wrap gap-2.5 justify-center">
+                <button class="bg-red-600/10 hover:bg-red-600 text-red-700 hover:text-white border border-red-200 hover:border-red-600 font-bold px-5 py-2.5 rounded-xl text-xs font-label-md flex items-center gap-1.5 transition-all shadow-sm active:scale-95" onclick="confirmLogout()">
+                    <span class="material-symbols-outlined text-sm">logout</span> Sair da Conta
+                </button>
+            </div>
+        </section>
+
+        <!-- Bento Grid Section -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+            
+            <!-- Personal Data -->
+            <div class="md:col-span-4 bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 text-primary mb-4">
+                        <span class="material-symbols-outlined">person</span>
+                        <h3 class="font-label-md font-bold uppercase tracking-wider text-sm">Meus Dados</h3>
+                    </div>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <p class="text-[11px] text-on-surface-variant uppercase font-bold">WhatsApp</p>
+                            <p class="font-bold text-primary" id="profile-phone">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-on-surface-variant uppercase font-bold">E-mail</p>
+                            <p class="font-bold text-primary" id="profile-email">--</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-6 py-2.5 px-4 border border-primary text-primary font-bold rounded-xl text-xs font-label-md hover:bg-primary hover:text-white transition-colors" onclick="openEditProfileModal()">
+                    Editar Dados
+                </button>
+            </div>
+
+            <!-- Delivery Addresses -->
+            <div class="md:col-span-8 bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2 text-primary">
+                        <span class="material-symbols-outlined">location_on</span>
+                        <h3 class="font-label-md font-bold uppercase tracking-wider text-sm">Endereços de Entrega</h3>
+                    </div>
+                    <button class="text-secondary font-bold text-xs hover:underline flex items-center gap-1" onclick="openAddressModal()">
+                        <span class="material-symbols-outlined text-sm">add</span> Novo Endereço
+                    </button>
+                </div>
+
+                <div class="space-y-3" id="addresses-list">
+                    <!-- Addresses populated dynamically from Supabase DB -->
+                </div>
+            </div>
+
+            <!-- Dietary Preferences -->
+            <div class="md:col-span-12 bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                <div class="flex items-center gap-2 text-primary mb-4">
+                    <span class="material-symbols-outlined">restaurant</span>
+                    <h3 class="font-label-md font-bold uppercase tracking-wider text-sm">Preferências Alimentares</h3>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button class="pref-chip bg-surface-container text-on-surface-variant text-xs font-label-md px-4 py-2 rounded-full flex items-center gap-1.5" onclick="togglePref(this)">
+                        Low Carb
+                    </button>
+                    <button class="pref-chip bg-surface-container text-on-surface-variant text-xs font-label-md px-4 py-2 rounded-full flex items-center gap-1.5" onclick="togglePref(this)">
+                        Alto Teor de Proteína
+                    </button>
+                    <button class="pref-chip bg-surface-container text-on-surface-variant text-xs font-label-md px-4 py-2 rounded-full flex items-center gap-1.5" onclick="togglePref(this)">
+                        Sem Lactose
+                    </button>
+                    <button class="pref-chip bg-surface-container text-on-surface-variant text-xs font-label-md px-4 py-2 rounded-full flex items-center gap-1.5" onclick="togglePref(this)">
+                        Sem Glúten
+                    </button>
+                    <button class="pref-chip bg-surface-container text-on-surface-variant text-xs font-label-md px-4 py-2 rounded-full flex items-center gap-1.5" onclick="togglePref(this)">
+                        Opção Vegetariana
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Edit Profile Modal -->
+<div class="fixed inset-0 bg-black/50 z-[80] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="edit-profile-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/30 relative">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeEditProfileModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1">Editar Seus Dados</h3>
+        <p class="text-on-surface-variant text-xs mb-4">Atualize suas informações de contato</p>
+
+        <form onsubmit="saveProfile(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Nome Completo</label>
+                <input type="text" id="edit-name" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">WhatsApp</label>
+                <input type="text" id="edit-phone" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">E-mail</label>
+                <input type="email" id="edit-email" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-headline-md font-bold text-sm hover:bg-primary-container transition-colors shadow">Salvar Alterações</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Address Modal -->
+<div class="fixed inset-0 bg-black/50 z-[80] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="address-modal">
+    <div class="bg-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/30 relative">
+        <button class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full" onclick="closeAddressModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-primary mb-1">Adicionar Endereço</h3>
+        <p class="text-on-surface-variant text-xs mb-4">Informe o local para entrega de suas refeições</p>
+
+        <form onsubmit="saveAddress(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Apelido (ex: Casa da Praia)</label>
+                <input type="text" id="addr-label" placeholder="Casa, Trabalho, etc." required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Endereço Completo</label>
+                <input type="text" id="addr-full" placeholder="Rua, Número, Bairro, Cidade" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-headline-md font-bold text-sm hover:bg-primary-container transition-colors shadow">Cadastrar Endereço</button>
+        </form>
+    </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant/30 shadow-[0px_-4px_20px_rgba(27,67,50,0.05)] rounded-t-xl px-2 py-2 flex justify-between items-center pb-safe max-w-2xl left-1/2 -translate-x-1/2 md:hidden">
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/" data-nav="inicio">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-label-md">Início</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/cardapio" data-nav="cardapio">
+        <span class="material-symbols-outlined">restaurant_menu</span>
+        <span class="text-[10px] font-label-md">Cardápio</span>
+    </a>
+    <button class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1 relative" onclick="toggleCart()" data-nav="cart-toggle">
+        <div class="relative">
+            <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="cart-badge-count absolute -top-1 -right-2 bg-secondary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+        </div>
+        <span class="text-[10px] font-label-md">Carrinho</span>
+    </button>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/pedidos" data-nav="pedidos">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="text-[10px] font-label-md">Pedidos</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
+        <span class="material-symbols-outlined">reviews</span>
+        <span class="text-[10px] font-label-md">Avaliações</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/perfil" data-nav="perfil">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-label-md">Perfil</span>
+    </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    let userPreferences = [];
+
+    async function loadProfileFromSupabase() {
+        if (typeof isUserLoggedIn !== 'function') return;
+
+        const loggedIn = isUserLoggedIn();
+        const unauthView = document.getElementById('unauth-profile-view');
+        const authView = document.getElementById('auth-profile-view');
+
+        if (!loggedIn) {
+            if (unauthView) unauthView.classList.remove('hidden');
+            if (authView) authView.classList.add('hidden');
+            return;
+        }
+
+        if (unauthView) unauthView.classList.add('hidden');
+        if (authView) authView.classList.remove('hidden');
+
+        const profile = await fetchProfileFromSupabase();
+        if (profile) {
+            const nameEl = document.getElementById('profile-name');
+            const phoneEl = document.getElementById('profile-phone');
+            const emailEl = document.getElementById('profile-email');
+            const avatarEl = document.getElementById('profile-avatar');
+            const editName = document.getElementById('edit-name');
+            const editPhone = document.getElementById('edit-phone');
+            const editEmail = document.getElementById('edit-email');
+
+            if (nameEl) nameEl.innerText = profile.name;
+            if (phoneEl) phoneEl.innerText = profile.phone || 'Não informado';
+            if (emailEl) emailEl.innerText = profile.email;
+            if (avatarEl && profile.avatar_url) avatarEl.src = profile.avatar_url;
+            if (editName) editName.value = profile.name;
+            if (editPhone) editPhone.value = profile.phone || '';
+            if (editEmail) editEmail.value = profile.email;
+
+            userPreferences = profile.dietary_preferences || [];
+            renderPreferences();
+        }
+
+        const addresses = await fetchAddressesFromSupabase();
+        const listEl = document.getElementById('addresses-list');
+        if (listEl) {
+            if (addresses && addresses.length > 0) {
+                listEl.innerHTML = addresses.map(addr => `
+                    <div class="p-4 ${addr.is_default ? 'bg-surface-container border border-outline-variant/20' : 'border border-outline-variant/30 opacity-80'} rounded-xl flex justify-between items-start">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary mt-0.5">${addr.label.toLowerCase().includes('casa') ? 'home' : 'work'}</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <p class="font-bold text-primary text-sm">${addr.label}</p>
+                                    ${addr.is_default ? '<span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">Padrão</span>' : ''}
+                                </div>
+                                <p class="text-xs text-on-surface-variant mt-1">${addr.street_address}<br/>${addr.city} - ${addr.state}</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer text-sm">edit</span>
+                    </div>
+                `).join('');
+            } else {
+                listEl.innerHTML = '<p class="text-xs text-on-surface-variant italic py-2">Nenhum endereço cadastrado ainda. Clique em "Novo Endereço" para adicionar.</p>';
+            }
+        }
+    }
+
+    function renderPreferences() {
+        const chips = document.querySelectorAll('.pref-chip');
+        chips.forEach(chip => {
+            const prefText = chip.innerText.trim().replace(/^check\s*/, '');
+            if (userPreferences.includes(prefText)) {
+                chip.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                chip.classList.add('bg-primary', 'text-white', 'shadow-sm');
+                if (!chip.querySelector('.material-symbols-outlined')) {
+                    chip.insertAdjacentHTML('afterbegin', '<span class="material-symbols-outlined text-sm">check</span> ');
+                }
+            } else {
+                chip.classList.remove('bg-primary', 'text-white', 'shadow-sm');
+                chip.classList.add('bg-surface-container', 'text-on-surface-variant');
+                chip.querySelector('.material-symbols-outlined')?.remove();
+            }
+        });
+    }
+
+    function openEditProfileModal() {
+        const modal = document.getElementById('edit-profile-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeEditProfileModal() {
+        const modal = document.getElementById('edit-profile-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function saveProfile(e) {
+        e.preventDefault();
+        const name = document.getElementById('edit-name').value;
+        const phone = document.getElementById('edit-phone').value;
+        const email = document.getElementById('edit-email').value;
+
+        if (typeof updateProfileInSupabase === 'function') {
+            await updateProfileInSupabase({ name, phone, email });
+        }
+
+        document.getElementById('profile-name').innerText = name;
+        document.getElementById('profile-phone').innerText = phone;
+        document.getElementById('profile-email').innerText = email;
+
+        closeEditProfileModal();
+        showToast('Perfil atualizado no Supabase!');
+    }
+
+    function openAddressModal() {
+        const modal = document.getElementById('address-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeAddressModal() {
+        const modal = document.getElementById('address-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function saveAddress(e) {
+        e.preventDefault();
+        const label = document.getElementById('addr-label').value;
+        const full = document.getElementById('addr-full').value;
+
+        if (typeof addAddressToSupabase === 'function') {
+            await addAddressToSupabase({ label, street_address: full });
+        }
+
+        closeAddressModal();
+        showToast('Novo endereço cadastrado no Supabase!');
+        loadProfileFromSupabase();
+    }
+
+    async function togglePref(btn) {
+        const prefText = btn.innerText.trim().replace(/^check\s*/, '');
+        if (userPreferences.includes(prefText)) {
+            userPreferences = userPreferences.filter(p => p !== prefText);
+        } else {
+            userPreferences.push(prefText);
+        }
+
+        if (typeof updateDietaryPreferencesInSupabase === 'function') {
+            await updateDietaryPreferencesInSupabase(userPreferences);
+        }
+        renderPreferences();
+        showToast('Preferências salvas!');
+    }
+
+    function confirmLogout() {
+        if (confirm("Deseja realmente sair da sua conta?")) {
+            logoutUserFromSupabase();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProfileFromSupabase();
+    });
+</script>
+</body>
+</html>

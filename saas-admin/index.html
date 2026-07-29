@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SaaS Master Admin | Plataforma de Entregas Multi-Loja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0f172a",
+                        "primary-container": "#1e293b",
+                        "secondary": "#2563eb",
+                        "background": "#f8fafc",
+                        "surface": "#ffffff",
+                        "surface-container": "#f1f5f9",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569",
+                        "outline-variant": "#cbd5e1"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+
+<!-- SaaS Master Dashboard Layout -->
+<div class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-slate-900 text-white p-6 flex flex-col justify-between flex-shrink-0">
+        <div>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xl shadow-lg">S</div>
+                <div>
+                    <h1 class="font-headline-md font-bold text-base leading-tight">Delivery SaaS</h1>
+                    <span class="text-[10px] text-blue-400 uppercase font-bold tracking-wider">Super Master Admin</span>
+                </div>
+            </div>
+
+            <nav class="space-y-2 text-xs font-bold">
+                <button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white shadow-md">
+                    <span class="material-symbols-outlined text-base">storefront</span> Lojas & Inquilinos
+                </button>
+                <a href="/saas-signup" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-base">add_business</span> Cadastrar Nova Loja
+                </a>
+                <a href="/" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-base">shopping_bag</span> Ver Loja Padrão
+                </a>
+            </nav>
+        </div>
+
+        <div class="pt-6 border-t border-slate-800 space-y-2">
+            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Supabase Project Ref</span>
+            <code class="text-xs text-blue-400 font-mono bg-slate-800 px-2 py-1 rounded block truncate">ssgmqogrowvxjluwtyrs</code>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 md:p-10 overflow-y-auto">
+
+        <!-- Top Bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-slate-200 pb-4">
+            <div>
+                <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-slate-900">Gestão Global de Inquilinos SaaS</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Gerencie restaurantes, domínios, números de WhatsApp e planos de assinatura</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full border border-emerald-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Multi-Tenant Ativo
+                </span>
+                <button onclick="openNewTenantModal()" class="bg-blue-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-all shadow-md flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">add</span> Criar Novo Inquilino
+                </button>
+            </div>
+        </div>
+
+        <!-- SaaS Metric Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl organic-shadow border border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total de Lojas</span>
+                    <span class="font-headline-lg text-2xl font-bold text-slate-900" id="saas-metric-total-stores">0</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">store</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl organic-shadow border border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">MRR Est. (SaaS)</span>
+                    <span class="font-headline-lg text-2xl font-bold text-emerald-600" id="saas-metric-mrr">R$ 590,00</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl organic-shadow border border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Lojas Ativas</span>
+                    <span class="font-headline-lg text-2xl font-bold text-slate-900" id="saas-metric-active-stores">0</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">check_circle</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl organic-shadow border border-slate-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Plano Enterprise</span>
+                    <span class="font-headline-lg text-2xl font-bold text-amber-600" id="saas-metric-enterprise">1</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">star</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stores / Tenants Table -->
+        <div class="bg-white p-6 rounded-2xl organic-shadow border border-slate-200">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-headline-md text-lg font-bold text-slate-900">Restaurantes & Inquilinos Cadastrados</h3>
+                <span class="text-xs text-slate-500">Sincronizado com Supabase DB</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-500 uppercase font-bold text-[10px]">
+                            <th class="py-3 px-3">Nome da Loja</th>
+                            <th class="py-3 px-3">Slug / URL Parameter</th>
+                            <th class="py-3 px-3">WhatsApp de Recebimento</th>
+                            <th class="py-3 px-3">Plano SaaS</th>
+                            <th class="py-3 px-3">Status</th>
+                            <th class="py-3 px-3 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="saas-tenants-table" class="divide-y divide-slate-100">
+                        <tr><td colspan="6" class="py-4 text-center text-slate-400">Carregando inquilinos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Modal: New / Edit Tenant -->
+<div class="fixed inset-0 bg-black/60 z-[120] hidden opacity-0 transition-opacity backdrop-blur-sm flex items-center justify-center p-4" id="tenant-modal">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-200 relative">
+        <button class="absolute top-4 right-4 text-slate-400 hover:bg-slate-100 p-1 rounded-full" onclick="closeTenantModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h3 class="font-headline-md text-xl font-bold text-slate-900 mb-1" id="tenant-modal-title">Cadastrar Novo Inquilino</h3>
+        <p class="text-xs text-slate-500 mb-4">Cria um novo restaurante isolado na plataforma SaaS</p>
+
+        <form onsubmit="handleTenantSubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="tenant-id" value="" />
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">Nome do Restaurante</label>
+                <input type="text" id="tenant-name" required placeholder="Ex: Burger Express Gourmet" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:border-blue-600 font-bold" />
+            </div>
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">Slug (Parâmetro URL)</label>
+                <input type="text" id="tenant-slug" required placeholder="ex: burgerexpress" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:outline-none focus:border-blue-600" />
+            </div>
+            <div>
+                <label class="block font-bold text-slate-900 mb-1">WhatsApp para Pedidos (com DDD)</label>
+                <input type="text" id="tenant-whatsapp" required placeholder="5548999998888" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold focus:outline-none focus:border-blue-600" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-900 mb-1">Plano de Assinatura</label>
+                    <select id="tenant-plan" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:border-blue-600 font-bold">
+                        <option value="starter">Starter (R$ 99/mês)</option>
+                        <option value="pro" selected>Pro (R$ 199/mês)</option>
+                        <option value="enterprise">Enterprise (R$ 399/mês)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-900 mb-1">Status da Conta</label>
+                    <select id="tenant-status" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:border-blue-600 font-bold">
+                        <option value="active" selected>Ativo</option>
+                        <option value="suspended">Suspenso</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-md mt-4">
+                Salvar Inquilino no Supabase
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script>
+    let allTenants = [];
+
+    async function loadSaaSData() {
+        allTenants = await fetchAllTenantsFromSupabase() || [];
+        renderTenantsTable();
+
+        document.getElementById('saas-metric-total-stores').innerText = allTenants.length;
+        document.getElementById('saas-metric-active-stores').innerText = allTenants.filter(t => t.status === 'active').length;
+        document.getElementById('saas-metric-enterprise').innerText = allTenants.filter(t => t.plan === 'enterprise').length;
+    }
+
+    function renderTenantsTable() {
+        const body = document.getElementById('saas-tenants-table');
+        if (!body) return;
+
+        if (allTenants.length === 0) {
+            body.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-slate-400">Nenhum inquilino cadastrado.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = allTenants.map(t => `
+            <tr class="hover:bg-slate-50">
+                <td class="py-3 px-3 font-bold text-slate-900">${t.name}</td>
+                <td class="py-3 px-3 font-mono text-blue-600">?store=${t.slug}</td>
+                <td class="py-3 px-3 text-slate-600 font-mono">${t.whatsapp_number}</td>
+                <td class="py-3 px-3"><span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${t.plan || 'pro'}</span></td>
+                <td class="py-3 px-3">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${t.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                        ${t.status === 'active' ? 'Ativo' : 'Suspenso'}
+                    </span>
+                </td>
+                <td class="py-3 px-3 text-right">
+                    <div class="inline-flex gap-1">
+                        <a href="/?store=${t.slug}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded font-bold text-xs">Acessar Loja</a>
+                        <button onclick="openEditTenantModal('${t.id}')" class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded font-bold text-xs">Editar</button>
+                        <button onclick="handleDeleteTenant('${t.id}')" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold text-xs">Excluir</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openNewTenantModal() {
+        document.getElementById('tenant-id').value = '';
+        document.getElementById('tenant-modal-title').innerText = 'Cadastrar Novo Inquilino';
+        document.getElementById('tenant-name').value = '';
+        document.getElementById('tenant-slug').value = '';
+        document.getElementById('tenant-whatsapp').value = '';
+        document.getElementById('tenant-plan').value = 'pro';
+        document.getElementById('tenant-status').value = 'active';
+
+        const modal = document.getElementById('tenant-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function openEditTenantModal(tenantId) {
+        const t = allTenants.find(item => item.id === tenantId);
+        if (!t) return;
+
+        document.getElementById('tenant-id').value = t.id;
+        document.getElementById('tenant-modal-title').innerText = 'Editar Inquilino';
+        document.getElementById('tenant-name').value = t.name;
+        document.getElementById('tenant-slug').value = t.slug;
+        document.getElementById('tenant-whatsapp').value = t.whatsapp_number;
+        document.getElementById('tenant-plan').value = t.plan || 'pro';
+        document.getElementById('tenant-status').value = t.status || 'active';
+
+        const modal = document.getElementById('tenant-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeTenantModal() {
+        const modal = document.getElementById('tenant-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    async function handleTenantSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('tenant-id').value;
+        const name = document.getElementById('tenant-name').value;
+        const slug = document.getElementById('tenant-slug').value;
+        const whatsapp = document.getElementById('tenant-whatsapp').value;
+        const plan = document.getElementById('tenant-plan').value;
+        const status = document.getElementById('tenant-status').value;
+
+        const data = { name, slug, whatsapp_number: whatsapp, plan, status };
+        let res = id ? await updateTenantInSupabase(id, data) : await createTenantInSupabase(data);
+
+        if (res) {
+            closeTenantModal();
+            loadSaaSData();
+        } else {
+            alert('Erro ao salvar inquilino no Supabase.');
+        }
+    }
+
+    async function handleDeleteTenant(id) {
+        if (confirm("Remover este inquilino e todos os seus dados do SaaS?")) {
+            const ok = await deleteTenantInSupabase(id);
+            if (ok) loadSaaSData();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSaaSData);
+</script>
+</body>
+</html>

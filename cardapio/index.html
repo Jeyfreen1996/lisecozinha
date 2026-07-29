@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>Cardápio Completo | Lise Cozinha Fit</title>
+    <meta name="description" content="Explore o cardápio completo da Lise Cozinha. Marmitas Fit, Low Carb, Sopas Detox e Sobremesas Saudáveis." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Anti-FOUT: Hide raw ligature text before font loads */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            opacity: 0;
+            transition: opacity 0.15s ease-in;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .fonts-loaded .material-symbols-outlined {
+            opacity: 1;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(27, 67, 50, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <script>
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                document.documentElement.classList.add('fonts-loaded');
+            });
+            setTimeout(() => document.documentElement.classList.add('fonts-loaded'), 300);
+        } else {
+            document.documentElement.classList.add('fonts-loaded');
+        }
+    </script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#012d1d",
+                        "primary-container": "#1b4332",
+                        "on-primary-container": "#86af99",
+                        "secondary": "#904d00",
+                        "secondary-container": "#fe932c",
+                        "tertiary": "#242624",
+                        "tertiary-container": "#3a3c39",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#414844",
+                        "outline-variant": "#c1c8c2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "price-display": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden min-h-screen">
+
+<!-- Header Top Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0px_4px_20px_rgba(27,67,50,0.08)]">
+    <div class="flex justify-between items-center px-4 md:px-8 h-16 w-full max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-150 md:hidden" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
+                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+            </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="/" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Início</a>
+            <a href="/cardapio" class="text-sm font-label-md text-primary font-bold hover:text-primary transition-colors">Cardápio</a>
+            <a href="/pedidos" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Meus Pedidos</a>
+            <a href="/avaliacoes" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Avaliações</a>
+            <a href="/perfil" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Perfil</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+            <button class="relative material-symbols-outlined text-primary p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-150" onclick="toggleCart()">
+                shopping_bag
+                <span class="cart-badge-count absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation Drawer -->
+<div class="fixed inset-0 bg-black/50 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed top-0 left-0 h-full w-72 bg-surface z-[70] transform -translate-x-full shadow-2xl transition-transform duration-300 flex flex-col" id="nav-drawer">
+    <div class="p-6 border-b border-outline-variant/30 flex items-center justify-between">
+        <h2 class="font-headline-md text-primary font-bold text-lg">Menu Lise</h2>
+        <button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full" onclick="toggleDrawer()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-label-md">Início</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-semibold" href="/cardapio">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+            <span class="font-label-md">Cardápio Completo</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/pedidos">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span class="font-label-md">Meus Pedidos</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/avaliacoes">
+            <span class="material-symbols-outlined">reviews</span>
+            <span class="font-label-md">Avaliações</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/perfil">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label-md">Meu Perfil</span>
+        </a>
+        <button onclick="openAuthModal('register')" class="w-full mt-4 flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-bold text-xs font-label-md shadow-md active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-sm">person_add</span>
+            <span>Cadastrar / Entrar</span>
+        </button>
+    </nav>
+</aside>
+
+<main class="pt-20 pb-28">
+    <!-- Hero Banner -->
+    <section class="px-4 md:px-8 pt-6 pb-4 max-w-7xl mx-auto text-center">
+        <h2 class="font-headline-lg text-2xl md:text-4xl font-bold text-primary mb-2">Cardápio Completo</h2>
+        <p class="font-body-md text-on-surface-variant text-sm md:text-base max-w-2xl mx-auto">Refeições ultracongeladas com macronutrientes balanceados para sua rotina de saúde.</p>
+        
+        <!-- Search Input -->
+        <div class="max-w-md mx-auto mt-6 relative">
+            <input type="text" id="search-input" placeholder="Buscar prato, ingrediente ou categoria..." class="w-full pl-11 pr-4 py-3 bg-surface-container rounded-full border border-outline-variant/40 text-sm focus:outline-none focus:border-primary transition-colors" onkeyup="filterMenu()"/>
+            <span class="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant text-sm">search</span>
+        </div>
+    </section>
+
+    <!-- Sticky Category Tabs -->
+    <nav class="sticky top-16 bg-surface/95 backdrop-blur-sm z-40 border-b border-outline-variant/30 overflow-x-auto no-scrollbar py-2">
+        <div class="flex px-4 md:px-8 gap-3 justify-start md:justify-center min-w-max items-center max-w-7xl mx-auto">
+            <button class="cat-btn active bg-primary text-white font-label-md text-xs px-5 py-2.5 rounded-full transition-all" onclick="selectCategory('Todos', this)">Todos</button>
+            <button class="cat-btn bg-surface-container text-on-surface-variant font-label-md text-xs px-5 py-2.5 rounded-full hover:bg-surface-container-high transition-all" onclick="selectCategory('Fit', this)">Fit</button>
+            <button class="cat-btn bg-surface-container text-on-surface-variant font-label-md text-xs px-5 py-2.5 rounded-full hover:bg-surface-container-high transition-all" onclick="selectCategory('Low Carb', this)">Low Carb</button>
+            <button class="cat-btn bg-surface-container text-on-surface-variant font-label-md text-xs px-5 py-2.5 rounded-full hover:bg-surface-container-high transition-all" onclick="selectCategory('Sopas', this)">Sopas & Cremes</button>
+            <button class="cat-btn bg-surface-container text-on-surface-variant font-label-md text-xs px-5 py-2.5 rounded-full hover:bg-surface-container-high transition-all" onclick="selectCategory('Sobremesas', this)">Sobremesas Fit</button>
+        </div>
+    </nav>
+
+    <!-- Product Grid -->
+    <section class="px-4 md:px-8 py-8 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="menu-grid">
+        
+        <!-- Dish 1 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Fit" data-name="Frango Grelhado com Brócolis e Arroz Integral">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" alt="Frango Grelhado"/>
+                    <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">Fit</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Frango Grelhado & Brócolis</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Iscas de frango marinado no limão siciliano, acompanhado de brócolis ao vapor e arroz integral agulhinha.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 28,90</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm1', name: 'Frango Grelhado & Brócolis', price: 28.90, image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dish 2 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Low Carb" data-name="Picanha com Purê de Couve-Flor">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" alt="Picanha Low Carb"/>
+                    <span class="absolute top-3 left-3 bg-secondary text-white text-xs px-3 py-1 rounded-full font-label-md">Low Carb</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Picanha & Purê de Couve-Flor</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Fatias macias de picanha grelhada sobre cama de purê aveludado de couve-flor e tomates confitados.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 34,50</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm2', name: 'Picanha & Purê de Couve-Flor', price: 34.50, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dish 3 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Low Carb" data-name="Lasanha de Zucchini Abobrinha Bolonhesa">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1574894709920-11b28e7367e3?auto=format&fit=crop&w=600&q=80" alt="Lasanha Zucchini"/>
+                    <span class="absolute top-3 left-3 bg-secondary text-white text-xs px-3 py-1 rounded-full font-label-md">Low Carb</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Lasanha de Zucchini Bolonhesa</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Lâminas de abobrinha fresca recheadas com molho artesanal de carne e queijo minas gratinado.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 32,90</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm3', name: 'Lasanha de Zucchini Bolonhesa', price: 32.90, image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dish 4 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Fit" data-name="Salmon Grelhado com Quinoa e Legumes">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80" alt="Strogonoff de Frango Fit"/>
+                    <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">Fit</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Salmão Grelhado & Quinoa</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Posta de salmão com ervas finas, mix de quinoa colorida e legumes salteados no azeite de oliva.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 38,90</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm4', name: 'Salmão Grelhado & Quinoa', price: 38.90, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dish 5 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Sopas" data-name="Creme de Mandioquinha com Carne Desfiada Sopa">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80" alt="Creme de Mandioquinha"/>
+                    <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">Sopa</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Creme de Mandioquinha & Carne</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Creme aveludado de mandioquinha com pedacinhos de patinho desfiado e cheiro-verde fresco.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 22,90</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm5', name: 'Creme de Mandioquinha & Carne', price: 22.90, image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dish 6 -->
+        <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="Sobremesas" data-name="Brownie Proteico Cacau 70 Whey">
+            <div>
+                <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80" alt="Brownie Proteico"/>
+                    <span class="absolute top-3 left-3 bg-secondary text-white text-xs px-3 py-1 rounded-full font-label-md">Sobremesa Fit</span>
+                </div>
+                <h3 class="font-headline-md text-lg font-bold text-primary mb-1">Brownie Proteico 70% Cacau</h3>
+                <p class="text-on-surface-variant text-xs mb-4">Feito com farinha de amêndoas, adoçado com xilitol e Whey Protein isolado. Delicioso e saudável.</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                <span class="font-price-display text-xl font-bold text-primary">R$ 14,90</span>
+                <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: 'm6', name: 'Brownie Proteico 70% Cacau', price: 14.90, image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80'})">
+                    <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                </button>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant/30 shadow-[0px_-4px_20px_rgba(27,67,50,0.05)] rounded-t-xl px-2 py-2 flex justify-between items-center pb-safe max-w-2xl left-1/2 -translate-x-1/2 md:hidden">
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/" data-nav="inicio">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-label-md">Início</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/cardapio" data-nav="cardapio">
+        <span class="material-symbols-outlined">restaurant_menu</span>
+        <span class="text-[10px] font-label-md">Cardápio</span>
+    </a>
+    <button class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1 relative" onclick="toggleCart()" data-nav="cart-toggle">
+        <div class="relative">
+            <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="cart-badge-count absolute -top-1 -right-2 bg-secondary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+        </div>
+        <span class="text-[10px] font-label-md">Carrinho</span>
+    </button>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/pedidos" data-nav="pedidos">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="text-[10px] font-label-md">Pedidos</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
+        <span class="material-symbols-outlined">reviews</span>
+        <span class="text-[10px] font-label-md">Avaliações</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/perfil" data-nav="perfil">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-label-md">Perfil</span>
+    </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    let activeCategory = 'Todos';
+    let allProducts = [];
+
+    async function loadMenuFromSupabase() {
+        if (typeof fetchProductsFromSupabase !== 'function') return;
+        const products = await fetchProductsFromSupabase();
+        if (products && products.length > 0) {
+            allProducts = products;
+            renderMenuGrid();
+        }
+    }
+
+    function renderMenuGrid() {
+        const grid = document.getElementById('menu-grid');
+        if (!grid || allProducts.length === 0) return;
+
+        grid.innerHTML = allProducts.map(p => `
+            <div class="menu-card bg-surface-container-lowest rounded-2xl organic-shadow overflow-hidden flex flex-col justify-between border border-outline-variant/20 p-4" data-category="${p.category_slug}" data-name="${p.name}">
+                <div>
+                    <div class="relative h-48 rounded-xl overflow-hidden mb-3">
+                        <img class="w-full h-full object-cover" src="${p.image_url}" alt="${p.name}"/>
+                        <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">${p.badge || p.category_slug}</span>
+                    </div>
+                    <h3 class="font-headline-md text-lg font-bold text-primary mb-1">${p.name}</h3>
+                    <p class="text-on-surface-variant text-xs mb-4">${p.description}</p>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-outline-variant/20">
+                    <span class="font-price-display text-xl font-bold text-primary">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>
+                    <button class="bg-secondary text-white px-4 py-2 rounded-xl font-label-md text-xs font-bold flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all shadow" onclick="addToCart({id: '${p.id}', name: '${p.name.replace(/'/g, "\\'")}', price: ${p.price}, image: '${p.image_url}'})">
+                        <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        filterMenu();
+    }
+
+    function selectCategory(category, buttonEl) {
+        activeCategory = category;
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-white', 'active');
+            btn.classList.add('bg-surface-container', 'text-on-surface-variant');
+        });
+        buttonEl.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        buttonEl.classList.add('bg-primary', 'text-white', 'active');
+        filterMenu();
+    }
+
+    function filterMenu() {
+        const searchInput = document.getElementById('search-input');
+        const query = searchInput ? searchInput.value.toLowerCase() : '';
+        const cards = document.querySelectorAll('.menu-card');
+
+        cards.forEach(card => {
+            const categoryMatch = activeCategory === 'Todos' || card.dataset.category === activeCategory;
+            const nameMatch = card.dataset.name.toLowerCase().includes(query);
+
+            if (categoryMatch && nameMatch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadMenuFromSupabase();
+        if (typeof subscribeToProductsRealtime === 'function') {
+            subscribeToProductsRealtime(() => loadMenuFromSupabase());
+        }
+    });
+</script>
+</body>
+</html>

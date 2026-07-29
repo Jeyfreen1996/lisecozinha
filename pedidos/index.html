@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <title>Meus Pedidos | Lise Cozinha Fit</title>
+    <meta name="description" content="Acompanhe seus pedidos em tempo real e confira seu histórico de marmitas saudáveis da Lise Cozinha." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        /* Anti-FOUT: Hide raw ligature text before font loads */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            opacity: 0;
+            transition: opacity 0.15s ease-in;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        .fonts-loaded .material-symbols-outlined {
+            opacity: 1;
+        }
+        .organic-shadow {
+            box-shadow: 0px 4px 20px rgba(27, 67, 50, 0.08);
+        }
+        .order-card-gradient {
+            background: linear-gradient(135deg, rgba(252, 249, 248, 1) 0%, rgba(240, 237, 237, 1) 100%);
+        }
+    </style>
+    <script>
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                document.documentElement.classList.add('fonts-loaded');
+            });
+            setTimeout(() => document.documentElement.classList.add('fonts-loaded'), 300);
+        } else {
+            document.documentElement.classList.add('fonts-loaded');
+        }
+    </script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#012d1d",
+                        "primary-container": "#1b4332",
+                        "on-primary-container": "#86af99",
+                        "secondary": "#904d00",
+                        "secondary-container": "#fe932c",
+                        "tertiary": "#242624",
+                        "tertiary-container": "#3a3c39",
+                        "background": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-surface": "#1b1c1c",
+                        "on-surface-variant": "#414844",
+                        "outline-variant": "#c1c8c2",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Montserrat", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+                        "label-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "price-display": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-28">
+
+<!-- Header Top Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0px_4px_20px_rgba(27,67,50,0.08)]">
+    <div class="flex justify-between items-center px-4 md:px-8 h-16 w-full max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95 duration-150 md:hidden" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
+                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+            </a>
+        </div>
+        
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="/" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Início</a>
+            <a href="/cardapio" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Cardápio</a>
+            <a href="/pedidos" class="text-sm font-label-md text-primary font-bold hover:text-primary transition-colors">Meus Pedidos</a>
+            <a href="/avaliacoes" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Avaliações</a>
+            <a href="/perfil" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Perfil</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+            <button class="relative material-symbols-outlined text-primary p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-150" onclick="toggleCart()">
+                shopping_bag
+                <span class="cart-badge-count absolute top-0 right-0 bg-secondary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation Drawer -->
+<div class="fixed inset-0 bg-black/50 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed top-0 left-0 h-full w-72 bg-surface z-[70] transform -translate-x-full shadow-2xl transition-transform duration-300 flex flex-col" id="nav-drawer">
+    <div class="p-6 border-b border-outline-variant/30 flex items-center justify-between">
+        <h2 class="font-headline-md text-primary font-bold text-lg">Menu Lise</h2>
+        <button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full" onclick="toggleDrawer()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-label-md">Início</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/cardapio">
+            <span class="material-symbols-outlined">restaurant_menu</span>
+            <span class="font-label-md">Cardápio Completo</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-semibold" href="/pedidos">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+            <span class="font-label-md">Meus Pedidos</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/avaliacoes">
+            <span class="material-symbols-outlined">reviews</span>
+            <span class="font-label-md">Avaliações</span>
+        </a>
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/perfil">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label-md">Meu Perfil</span>
+        </a>
+        <button onclick="openAuthModal('register')" class="w-full mt-4 flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-primary text-white font-bold text-xs font-label-md shadow-md active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-sm">person_add</span>
+            <span>Cadastrar / Entrar</span>
+        </button>
+    </nav>
+</aside>
+
+<main class="pt-24 px-4 md:px-8 max-w-4xl mx-auto">
+    <!-- Title Section -->
+    <section class="mb-8">
+        <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-primary mb-1">Meus Pedidos</h2>
+        <p class="text-on-surface-variant text-sm md:text-base">Acompanhe o preparo e a entrega das suas refeições em tempo real.</p>
+    </section>
+
+    <!-- Active Order Live Tracker Container -->
+    <section class="mb-10" id="active-order-section">
+        <h3 class="font-label-md text-xs font-bold text-secondary uppercase tracking-widest mb-3">Pedido em Andamento</h3>
+        <div id="active-order-container">
+            <div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs font-medium">
+                Carregando pedidos...
+            </div>
+        </div>
+    </section>
+
+    <!-- Past Orders History Container -->
+    <section class="mb-10" id="past-orders-section">
+        <h3 class="font-label-md text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Histórico de Pedidos</h3>
+        <div class="space-y-4" id="past-orders-container">
+            <div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs font-medium">
+                Carregando histórico...
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Support Banner -->
+    <section class="bg-secondary-container/10 rounded-2xl p-6 border border-secondary/20 text-center mb-8">
+        <div class="w-12 h-12 bg-secondary text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow">
+            <span class="material-symbols-outlined">support_agent</span>
+        </div>
+        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Precisa de ajuda com seu pedido?</h4>
+        <p class="text-on-surface-variant text-sm mb-5">Nossa equipe de atendimento está disponível pelo WhatsApp para te auxiliar.</p>
+        <a class="inline-flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-label-md text-xs font-bold hover:scale-105 transition-all shadow-md" href="https://wa.me/554898591226?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20meu%20pedido%20Lise%20Cozinha" target="_blank">
+            <span class="material-symbols-outlined text-base">chat</span> Falar com Suporte
+        </a>
+    </section>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant/30 shadow-[0px_-4px_20px_rgba(27,67,50,0.05)] rounded-t-xl px-2 py-2 flex justify-between items-center pb-safe max-w-2xl left-1/2 -translate-x-1/2 md:hidden">
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/" data-nav="inicio">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-label-md">Início</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/cardapio" data-nav="cardapio">
+        <span class="material-symbols-outlined">restaurant_menu</span>
+        <span class="text-[10px] font-label-md">Cardápio</span>
+    </a>
+    <button class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1 relative" onclick="toggleCart()" data-nav="cart-toggle">
+        <div class="relative">
+            <span class="material-symbols-outlined">shopping_bag</span>
+            <span class="cart-badge-count absolute -top-1 -right-2 bg-secondary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+        </div>
+        <span class="text-[10px] font-label-md">Carrinho</span>
+    </button>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/pedidos" data-nav="pedidos">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="text-[10px] font-label-md">Pedidos</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
+        <span class="material-symbols-outlined">reviews</span>
+        <span class="text-[10px] font-label-md">Avaliações</span>
+    </a>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/perfil" data-nav="perfil">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-label-md">Perfil</span>
+    </a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script src="/assets/js/app.js"></script>
+<script>
+    async function loadOrdersFromSupabase() {
+        if (typeof fetchActiveOrdersFromSupabase !== 'function') return;
+
+        if (typeof isUserLoggedIn === 'function' && !isUserLoggedIn()) {
+            const activeContainer = document.getElementById('active-order-container');
+            const pastContainer = document.getElementById('past-orders-container');
+            if (activeContainer) {
+                activeContainer.innerHTML = `
+                    <div class="bg-surface rounded-2xl p-8 border border-outline-variant/30 text-center organic-shadow">
+                        <span class="material-symbols-outlined text-4xl text-primary mb-2">receipt_long</span>
+                        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Acompanhe seus Pedidos em Tempo Real</h4>
+                        <p class="text-on-surface-variant text-xs mb-5 max-w-sm mx-auto">Faça login ou crie sua conta para ver seu pedido em andamento e histórico de refeições.</p>
+                        <button onclick="openAuthModal('login')" class="bg-primary text-white font-bold px-6 py-2.5 rounded-xl text-xs font-label-md hover:bg-primary-container transition-all shadow-md">
+                            Entrar ou Criar Conta
+                        </button>
+                    </div>
+                `;
+            }
+            if (pastContainer) {
+                pastContainer.innerHTML = `<div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs italic">Faça login para ver seu histórico.</div>`;
+            }
+            return;
+        }
+
+        // Active Order
+        const activeOrders = await fetchActiveOrdersFromSupabase();
+        const activeContainer = document.getElementById('active-order-container');
+
+        if (activeContainer) {
+            if (activeOrders && activeOrders.length > 0) {
+                const order = activeOrders[0];
+                const itemsSummary = order.order_items && order.order_items.length > 0 
+                    ? `${order.order_items.length} itens (${order.order_items.map(i => i.product_name).slice(0, 2).join(', ')}...)`
+                    : 'Marmitas Fit Selecionadas';
+
+                let statusText = 'Em Preparo na Cozinha';
+                let icon = 'skillet';
+                let step1Active = true, step2Active = true, step3Active = false;
+
+                if (order.status === 'pending' || order.status === 'confirmed') {
+                    statusText = 'Pedido Confirmado';
+                    icon = 'check_circle';
+                    step1Active = true; step2Active = false; step3Active = false;
+                } else if (order.status === 'delivering') {
+                    statusText = 'Saiu para Entrega';
+                    icon = 'delivery_dining';
+                    step1Active = true; step2Active = true; step3Active = true;
+                }
+
+                activeContainer.innerHTML = `
+                    <div class="order-card-gradient rounded-2xl p-6 border border-outline-variant/40 organic-shadow relative overflow-hidden">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-2">
+                            <div>
+                                <span class="font-label-md text-xs text-on-surface-variant font-bold">Código do Pedido: ${order.code}</span>
+                                <h4 class="font-headline-md text-xl font-bold text-primary mt-1">${itemsSummary}</h4>
+                            </div>
+                            <div class="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full text-xs font-label-md font-bold flex items-center gap-1.5 shadow-sm">
+                                <span class="material-symbols-outlined text-base fill">${icon}</span>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Tracker Timeline -->
+                        <div class="flex items-center justify-between mb-8 px-2">
+                            <div class="flex flex-col items-center gap-2 relative z-10">
+                                <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow">
+                                    <span class="material-symbols-outlined text-base fill">check</span>
+                                </div>
+                                <span class="text-xs font-bold text-primary">Confirmado</span>
+                            </div>
+
+                            <div class="h-1 flex-grow ${step2Active ? 'bg-primary' : 'bg-outline-variant/50'} mx-2 rounded-full"></div>
+
+                            <div class="flex flex-col items-center gap-2 relative z-10">
+                                <div class="w-11 h-11 rounded-full ${step2Active && !step3Active ? 'bg-primary text-white ring-4 ring-primary-fixed shadow-lg animate-pulse' : (step2Active ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant')} flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-lg fill">skillet</span>
+                                </div>
+                                <span class="text-xs font-bold ${step2Active ? 'text-primary' : 'text-on-surface-variant'}">Cozinha</span>
+                            </div>
+
+                            <div class="h-1 flex-grow ${step3Active ? 'bg-primary' : 'bg-outline-variant/50'} mx-2 rounded-full"></div>
+
+                            <div class="flex flex-col items-center gap-2 relative z-10">
+                                <div class="w-9 h-9 rounded-full ${step3Active ? 'bg-primary text-white ring-4 ring-primary-fixed shadow-lg animate-pulse' : 'bg-surface-container-high text-on-surface-variant'} flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-base">delivery_dining</span>
+                                </div>
+                                <span class="text-xs font-bold ${step3Active ? 'text-primary' : 'text-on-surface-variant'}">Entrega</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-t border-outline-variant/30 pt-4 gap-4">
+                            <div class="text-on-surface-variant text-xs space-y-1">
+                                <p><strong>Cliente:</strong> ${order.customer_name}</p>
+                                <p><strong>Endereço de Entrega:</strong> ${order.delivery_address}</p>
+                            </div>
+                            <div class="text-left md:text-right">
+                                <span class="block text-on-surface-variant text-xs">Total do Pedido</span>
+                                <span class="font-price-display text-primary text-2xl font-bold">R$ ${parseFloat(order.total_amount).toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                activeContainer.innerHTML = `
+                    <div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs font-medium">
+                        Nenhum pedido em andamento no momento. <a href="/cardapio" class="text-secondary font-bold hover:underline">Ver Cardápio</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Past Orders
+        const pastOrders = await fetchPastOrdersFromSupabase();
+        const pastContainer = document.getElementById('past-orders-container');
+
+        if (pastContainer) {
+            if (pastOrders && pastOrders.length > 0) {
+                pastContainer.innerHTML = pastOrders.map(po => {
+                    const title = po.order_items && po.order_items.length > 0 
+                        ? po.order_items[0].product_name 
+                        : 'Pedido Concluído Lise Cozinha';
+                    const firstImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80';
+                    const itemsJson = JSON.stringify(po.order_items ? po.order_items.map(i => ({id: i.product_id, name: i.product_name, price: i.price})) : []).replace(/"/g, '&quot;');
+
+                    return `
+                        <div class="bg-surface rounded-2xl p-5 border border-outline-variant/30 hover:border-primary-container/40 transition-all flex flex-col md:flex-row gap-4 items-start md:items-center justify-between organic-shadow">
+                            <div class="flex gap-4 items-center">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
+                                    <img class="w-full h-full object-cover" src="${firstImg}" alt="${title}"/>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-label-md text-xs text-on-surface-variant font-bold">${po.code}</span>
+                                        <span class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">Entregue</span>
+                                    </div>
+                                    <h5 class="font-headline-md font-bold text-primary text-base mt-0.5">${title}</h5>
+                                    <span class="text-on-surface-variant text-xs">R$ ${parseFloat(po.total_amount).toFixed(2).replace('.', ',')} • ${po.payment_method}</span>
+                                </div>
+                            </div>
+                            <button class="bg-secondary/10 text-secondary hover:bg-secondary hover:text-white px-5 py-2 rounded-xl text-xs font-label-md font-bold transition-all flex items-center gap-1.5 active:scale-95" onclick="reorderItems(${itemsJson})">
+                                <span class="material-symbols-outlined text-sm">replay</span> Refazer Pedido
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                pastContainer.innerHTML = `
+                    <div class="bg-surface rounded-2xl p-6 border border-outline-variant/30 text-center text-on-surface-variant text-xs italic">
+                        Você ainda não possui pedidos concluídos no histórico.
+                    </div>
+                `;
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadOrdersFromSupabase();
+        if (typeof subscribeToOrdersRealtime === 'function') {
+            subscribeToOrdersRealtime((payload) => {
+                showToast('Status do pedido atualizado!', 'info');
+                loadOrdersFromSupabase();
+            });
+        }
+    });
+</script>
+</body>
+</html>
