@@ -991,16 +991,28 @@ async function addAddressToSupabase(addressData) {
     if (!supabaseClient) return null;
     const currentUser = getCurrentUser();
     try {
+        const payload = {
+            profile_id: currentUser ? currentUser.id : null,
+            label: addressData.label || 'Meu Endereço',
+            street_address: addressData.street_address,
+            city: addressData.city || '',
+            state: addressData.state || '',
+            is_default: addressData.is_default || false
+        };
+        if (addressData.latitude) payload.latitude = addressData.latitude;
+        if (addressData.longitude) payload.longitude = addressData.longitude;
+
+        // If marking as default, unset previous defaults first
+        if (payload.is_default && currentUser) {
+            await supabaseClient
+                .from('addresses')
+                .update({ is_default: false })
+                .eq('profile_id', currentUser.id);
+        }
+
         const { data, error } = await supabaseClient
             .from('addresses')
-            .insert([{
-                profile_id: currentUser ? currentUser.id : null,
-                label: addressData.label,
-                street_address: addressData.street_address,
-                city: 'Armazém',
-                state: 'SC',
-                is_default: false
-            }])
+            .insert([payload])
             .select()
             .single();
         if (error) throw error;
@@ -1009,6 +1021,60 @@ async function addAddressToSupabase(addressData) {
         console.error('Add address error:', err);
         return null;
     }
+}
+
+/**
+ * Returns the active delivery address.
+ * Priority: Supabase default > localStorage > null
+ */
+async function getActiveDeliveryAddress() {
+    // Try from localStorage first for speed
+    const cached = localStorage.getItem('lise_delivery_address');
+    let localAddr = null;
+    if (cached) {
+        try { localAddr = JSON.parse(cached); } catch (e) {}
+    }
+
+    // Try Supabase if user is logged in
+    if (isUserLoggedIn() && supabaseClient) {
+        try {
+            const addresses = await fetchAddressesFromSupabase();
+            if (addresses && addresses.length > 0) {
+                const def = addresses.find(a => a.is_default) || addresses[0];
+                // Also update localStorage cache
+                localStorage.setItem('lise_delivery_address', JSON.stringify({
+                    label: def.label,
+                    street_address: def.street_address,
+                    city: def.city || '',
+                    state: def.state || '',
+                    latitude: def.latitude,
+                    longitude: def.longitude
+                }));
+                return def;
+            }
+        } catch (err) {
+            console.error('getActiveDeliveryAddress error:', err);
+        }
+    }
+
+    return localAddr;
+}
+
+/**
+ * Saves delivery address from cart flow.
+ * Persists to localStorage immediately, and to Supabase if user is logged in.
+ * @param {Object} addressData - { label, street_address, city, state, latitude, longitude }
+ */
+async function saveDeliveryAddressFromCart(addressData) {
+    // Always cache locally for immediate use
+    localStorage.setItem('lise_delivery_address', JSON.stringify(addressData));
+
+    // Persist to Supabase if user is authenticated
+    if (isUserLoggedIn()) {
+        await addAddressToSupabase({ ...addressData, is_default: true });
+    }
+
+    return true;
 }
 
 // Subscriptions

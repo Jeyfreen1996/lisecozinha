@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
         /* Anti-FOUT: Hide raw ligature text before font loads */
@@ -310,10 +311,37 @@
                 <label class="block text-xs font-label-md text-primary font-bold mb-1">Apelido (ex: Casa da Praia)</label>
                 <input type="text" id="addr-label" placeholder="Casa, Trabalho, etc." required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
             </div>
+
+            <!-- GPS Button -->
+            <button type="button" onclick="useMyLocationForProfile()" id="profile-gps-btn"
+                class="w-full py-2.5 px-4 rounded-xl border border-primary/30 bg-surface-container text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all active:scale-95">
+                <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">my_location</span>
+                Usar minha localização atual (GPS)
+            </button>
+
+            <div class="flex items-center gap-2">
+                <div class="flex-1 h-px bg-outline-variant/40"></div>
+                <span class="text-[10px] text-on-surface-variant font-bold">ou</span>
+                <div class="flex-1 h-px bg-outline-variant/40"></div>
+            </div>
+
             <div>
                 <label class="block text-xs font-label-md text-primary font-bold mb-1">Endereço Completo</label>
-                <input type="text" id="addr-full" placeholder="Rua, Número, Bairro, Cidade" required class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" />
+                <div class="relative">
+                    <input type="text" id="addr-full" placeholder="Digite a rua, número, bairro..." required
+                        class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary pr-9"
+                        autocomplete="off"
+                        oninput="onProfileAddressInput(this.value)" />
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">search</span>
+                    <div id="profile-address-suggestions" class="absolute top-full left-0 right-0 bg-surface border border-outline-variant/30 rounded-xl shadow-xl z-50 mt-1 overflow-hidden hidden"></div>
+                </div>
             </div>
+
+            <input type="hidden" id="addr-city" />
+            <input type="hidden" id="addr-state" />
+            <input type="hidden" id="addr-lat" />
+            <input type="hidden" id="addr-lng" />
+
             <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl font-headline-md font-bold text-sm hover:bg-primary-container transition-colors shadow">Cadastrar Endereço</button>
         </form>
     </div>
@@ -353,6 +381,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase.js"></script>
 <script src="/assets/js/app.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <script>
     let userPreferences = [];
 
@@ -401,20 +430,32 @@
                 listEl.innerHTML = addresses.map(addr => `
                     <div class="p-4 ${addr.is_default ? 'bg-surface-container border border-outline-variant/20' : 'border border-outline-variant/30 opacity-80'} rounded-xl flex justify-between items-start">
                         <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-primary mt-0.5">${addr.label.toLowerCase().includes('casa') ? 'home' : 'work'}</span>
+                            <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings:'FILL' 1">${addr.label && addr.label.toLowerCase().includes('trabalho') ? 'work' : 'home'}</span>
                             <div>
                                 <div class="flex items-center gap-2">
                                     <p class="font-bold text-primary text-sm">${addr.label}</p>
                                     ${addr.is_default ? '<span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">Padrão</span>' : ''}
                                 </div>
-                                <p class="text-xs text-on-surface-variant mt-1">${addr.street_address}<br/>${addr.city} - ${addr.state}</p>
+                                <p class="text-xs text-on-surface-variant mt-1">${addr.street_address}${addr.city ? '<br/>' + addr.city + (addr.state ? ' - ' + addr.state : '') : ''}</p>
                             </div>
                         </div>
                         <span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer text-sm">edit</span>
                     </div>
                 `).join('');
             } else {
-                listEl.innerHTML = '<p class="text-xs text-on-surface-variant italic py-2">Nenhum endereço cadastrado ainda. Clique em "Novo Endereço" para adicionar.</p>';
+                listEl.innerHTML = `
+                    <div class="text-center py-8 px-4">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="material-symbols-outlined text-primary text-2xl">location_off</span>
+                        </div>
+                        <p class="text-sm font-bold text-primary mb-1">Nenhum endereço cadastrado</p>
+                        <p class="text-xs text-on-surface-variant mb-4">Adicione seu endereço de entrega para agilizar seus pedidos.</p>
+                        <button onclick="openAddressModal()" class="bg-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 mx-auto hover:bg-primary-container transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-sm">add_location</span>
+                            Adicionar meu endereço
+                        </button>
+                    </div>
+                `;
             }
         }
     }
@@ -469,8 +510,135 @@
 
     function openAddressModal() {
         const modal = document.getElementById('address-modal');
+        // Reset fields
+        ['addr-label', 'addr-full', 'addr-city', 'addr-state', 'addr-lat', 'addr-lng'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const suggestions = document.getElementById('profile-address-suggestions');
+        if (suggestions) suggestions.classList.add('hidden');
+
         modal.classList.remove('hidden');
         setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    /** Mapbox autocomplete for profile address modal */
+    async function onProfileAddressInput(value) {
+        const suggestionsEl = document.getElementById('profile-address-suggestions');
+        if (!suggestionsEl) return;
+
+        // Clear hidden fields on new input
+        ['addr-city', 'addr-state', 'addr-lat', 'addr-lng'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        if (!value || value.length < 3) {
+            suggestionsEl.classList.add('hidden');
+            return;
+        }
+
+        try {
+            const res = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(value)}.json?access_token=${MAPBOX_TOKEN}&language=pt&country=BR&types=address,place,neighborhood&limit=5`
+            );
+            const data = await res.json();
+            if (!data.features || data.features.length === 0) {
+                suggestionsEl.classList.add('hidden');
+                return;
+            }
+            suggestionsEl.classList.remove('hidden');
+            suggestionsEl.innerHTML = data.features.map(f => `
+                <button type="button" class="w-full text-left px-4 py-2.5 text-sm hover:bg-surface-container-low border-b border-outline-variant/20 last:border-0 flex items-start gap-2"
+                    onclick="selectProfileAddressSuggestion(${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                    <span class="material-symbols-outlined text-sm text-primary mt-0.5 flex-shrink-0">location_on</span>
+                    <span class="text-on-surface text-xs">${f.place_name}</span>
+                </button>
+            `).join('');
+        } catch(err) {
+            console.error('Mapbox profile autocomplete error:', err);
+        }
+    }
+
+    /** Select a Mapbox suggestion in profile modal */
+    function selectProfileAddressSuggestion(feature) {
+        const input = document.getElementById('addr-full');
+        const suggestionsEl = document.getElementById('profile-address-suggestions');
+        if (input) input.value = feature.place_name;
+        if (suggestionsEl) suggestionsEl.classList.add('hidden');
+
+        let city = '', state = '';
+        if (feature.context) {
+            feature.context.forEach(c => {
+                if (c.id.startsWith('place')) city = c.text;
+                if (c.id.startsWith('region')) state = c.short_code ? c.short_code.replace('BR-', '') : c.text;
+            });
+        }
+        const cityEl = document.getElementById('addr-city');
+        const stateEl = document.getElementById('addr-state');
+        const latEl = document.getElementById('addr-lat');
+        const lngEl = document.getElementById('addr-lng');
+        if (cityEl) cityEl.value = city;
+        if (stateEl) stateEl.value = state;
+        if (latEl && feature.center) latEl.value = feature.center[1];
+        if (lngEl && feature.center) lngEl.value = feature.center[0];
+    }
+
+    /** Use GPS in profile address modal */
+    async function useMyLocationForProfile() {
+        const btn = document.getElementById('profile-gps-btn');
+        if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Localizando...'; btn.disabled = true; }
+
+        if (!navigator.geolocation) {
+            showToast('Geolocalização não suportada.', 'warning');
+            if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-sm">my_location</span> Usar minha localização'; btn.disabled = false; }
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                try {
+                    const res = await fetch(
+                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}&language=pt&types=address,place&limit=1`
+                    );
+                    const data = await res.json();
+                    if (data.features && data.features.length > 0) {
+                        const f = data.features[0];
+                        const input = document.getElementById('addr-full');
+                        if (input) input.value = f.place_name;
+
+                        let city = '', state = '';
+                        if (f.context) {
+                            f.context.forEach(c => {
+                                if (c.id.startsWith('place')) city = c.text;
+                                if (c.id.startsWith('region')) state = c.short_code ? c.short_code.replace('BR-', '') : c.text;
+                            });
+                        }
+                        const cityEl = document.getElementById('addr-city');
+                        const stateEl = document.getElementById('addr-state');
+                        const latEl = document.getElementById('addr-lat');
+                        const lngEl = document.getElementById('addr-lng');
+                        if (cityEl) cityEl.value = city;
+                        if (stateEl) stateEl.value = state;
+                        if (latEl) latEl.value = latitude;
+                        if (lngEl) lngEl.value = longitude;
+
+                        // Auto-set label if empty
+                        const labelEl = document.getElementById('addr-label');
+                        if (labelEl && !labelEl.value) labelEl.value = 'Minha Localização';
+
+                        showToast('Localização obtida! Confirme o endereço.', 'success');
+                    }
+                } catch(err) { showToast('Erro ao obter localização.', 'warning'); }
+                if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-sm" style="font-variation-settings:\'FILL\' 1">my_location</span> Usar minha localização atual (GPS)'; btn.disabled = false; }
+            },
+            () => {
+                showToast('Permissão negada. Digite manualmente.', 'warning');
+                if (btn) { btn.innerHTML = '<span class="material-symbols-outlined text-sm">my_location</span> Usar minha localização'; btn.disabled = false; }
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
     }
 
     function closeAddressModal() {
@@ -483,13 +651,32 @@
         e.preventDefault();
         const label = document.getElementById('addr-label').value;
         const full = document.getElementById('addr-full').value;
+        const city = document.getElementById('addr-city')?.value || '';
+        const state = document.getElementById('addr-state')?.value || '';
+        const lat = document.getElementById('addr-lat')?.value || null;
+        const lng = document.getElementById('addr-lng')?.value || null;
+
+        const addressData = {
+            label,
+            street_address: full,
+            city,
+            state,
+            latitude: lat ? parseFloat(lat) : null,
+            longitude: lng ? parseFloat(lng) : null,
+            is_default: false
+        };
 
         if (typeof addAddressToSupabase === 'function') {
-            await addAddressToSupabase({ label, street_address: full });
+            await addAddressToSupabase(addressData);
+        }
+
+        // Also save to localStorage for cart sync
+        if (typeof saveDeliveryAddressFromCart === 'function') {
+            await saveDeliveryAddressFromCart({ ...addressData, is_default: true });
         }
 
         closeAddressModal();
-        showToast('Novo endereço cadastrado no Supabase!');
+        showToast('Novo endereço cadastrado!');
         loadProfileFromSupabase();
     }
 
