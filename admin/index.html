@@ -959,8 +959,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/js/supabase.js"></script>
-<script src="/assets/js/app.js"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/app.js"></script>
 <script>
     let adminOrders = [];
     let adminProducts = [];
@@ -968,33 +968,49 @@
     let adminCoupons = [];
 
     function checkAdminAuthView() {
-        const loginScreen = document.getElementById('admin-login-screen');
-        const appLayout = document.getElementById('admin-app-layout');
-        const currentAdmin = getCurrentAdmin();
+        try {
+            const loginScreen = document.getElementById('admin-login-screen');
+            const appLayout = document.getElementById('admin-app-layout');
+            const currentAdmin = getCurrentAdmin();
 
-        if (!currentAdmin) {
-            loginScreen.classList.remove('hidden');
-            appLayout.classList.add('hidden');
-        } else {
-            loginScreen.classList.add('hidden');
-            appLayout.classList.remove('hidden');
-            const displayEl = document.getElementById('admin-user-display');
-            if (displayEl) displayEl.innerText = currentAdmin.name || 'Admin';
-            loadAdminData();
+            if (!currentAdmin) {
+                loginScreen.classList.remove('hidden');
+                appLayout.classList.add('hidden');
+            } else {
+                loginScreen.classList.add('hidden');
+                appLayout.classList.remove('hidden');
+                const displayEl = document.getElementById('admin-user-display');
+                if (displayEl) displayEl.innerText = currentAdmin.name || 'Admin';
+                loadAdminData();
+            }
+        } catch (err) {
+            alert('Erro no checkAdminAuthView: ' + err.message);
         }
     }
 
     async function handleAdminLogin(e) {
         e.preventDefault();
-        const email = document.getElementById('admin-login-email').value;
-        const pass = document.getElementById('admin-login-password').value;
+        try {
+            const email = document.getElementById('admin-login-email').value;
+            const pass = document.getElementById('admin-login-password').value;
 
-        const res = await loginAdminInSupabase(email, pass);
-        if (res) {
-            showToast(`Bem-vindo, ${res.name}!`, 'success');
-            checkAdminAuthView();
-        } else {
-            alert('E-mail ou senha incorretos! Tente novamente.');
+            if (typeof loginAdminInSupabase !== 'function') {
+                throw new Error('Supabase script not loaded (loginAdminInSupabase undefined)');
+            }
+
+            const res = await loginAdminInSupabase(email, pass);
+            if (res) {
+                if (typeof showToast === 'function') {
+                    showToast(`Bem-vindo, ${res.name}!`, 'success');
+                } else {
+                    alert(`Bem-vindo, ${res.name}!`);
+                }
+                checkAdminAuthView();
+            } else {
+                alert('E-mail ou senha incorretos! Tente novamente.');
+            }
+        } catch (err) {
+            alert('Erro Crítico no Login: ' + err.message);
         }
     }
 
@@ -2546,7 +2562,7 @@
         });
 
         const printWin = window.open('', '_blank', 'width=800,height=900');
-        printWin.document.write(\`
+        printWin.document.write(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -2596,7 +2612,7 @@
     </tr>
   </thead>
   <tbody>
-    \${rowsHtml || '<tr><td colspan="5">Nenhum pedido registrado no período.</td></tr>'}
+    ${rowsHtml || '<tr><td colspan="5">Nenhum pedido registrado no período.</td></tr>'}
   </tbody>
 </table>
 
@@ -2614,7 +2630,7 @@
 <\/script>
 </body>
 </html>
-        \`);
+        `);
         printWin.document.close();
     }
 </script>
