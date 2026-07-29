@@ -337,6 +337,11 @@
                 </div>
             </div>
 
+            <div>
+                <label class="block text-xs font-label-md text-primary font-bold mb-1">Complemento</label>
+                <input type="text" id="addr-complement" placeholder="Apto, andar, referência, ponto de referência..." class="w-full px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-sm focus:outline-none focus:border-primary" autocomplete="off" />
+            </div>
+
             <input type="hidden" id="addr-city" />
             <input type="hidden" id="addr-state" />
             <input type="hidden" id="addr-lat" />
@@ -511,7 +516,7 @@
     function openAddressModal() {
         const modal = document.getElementById('address-modal');
         // Reset fields
-        ['addr-label', 'addr-full', 'addr-city', 'addr-state', 'addr-lat', 'addr-lng'].forEach(id => {
+        ['addr-label', 'addr-full', 'addr-complement', 'addr-city', 'addr-state', 'addr-lat', 'addr-lng'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
@@ -651,6 +656,7 @@
         e.preventDefault();
         const label = document.getElementById('addr-label').value;
         const full = document.getElementById('addr-full').value;
+        const complement = document.getElementById('addr-complement')?.value?.trim() || '';
         const city = document.getElementById('addr-city')?.value || '';
         const state = document.getElementById('addr-state')?.value || '';
         const lat = document.getElementById('addr-lat')?.value || null;
@@ -659,6 +665,7 @@
         const addressData = {
             label,
             street_address: full,
+            complement,
             city,
             state,
             latitude: lat ? parseFloat(lat) : null,

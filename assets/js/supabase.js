@@ -875,7 +875,7 @@ async function createOrderInSupabase(orderData, cartItems) {
                 customer_name: orderData.customer_name || currentUser.name,
                 customer_phone: orderData.customer_phone || currentUser.phone,
                 delivery_address: orderData.delivery_address || 'Rua das Acácias, 452, Apto 42',
-                status: 'cooking',
+                status: 'aguardando_pagamento',
                 payment_method: 'Pix / WhatsApp',
                 total_amount: orderData.total_amount
             }])
@@ -1075,6 +1075,79 @@ async function saveDeliveryAddressFromCart(addressData) {
     }
 
     return true;
+}
+
+// ----------------------------------------------------
+// SETTINGS MANAGEMENT (Key-Value Store)
+// ----------------------------------------------------
+
+/**
+ * Fetch all settings from Supabase settings table.
+ * Returns object: { key: value }
+ */
+async function fetchSettingsFromSupabase() {
+    const cached = localStorage.getItem('lise_settings');
+    let settings = {};
+    if (cached) {
+        try { settings = JSON.parse(cached); } catch(e) {}
+    }
+
+    if (!supabaseClient) return settings;
+    try {
+        const { data, error } = await supabaseClient
+            .from('settings')
+            .select('key, value');
+        if (!error && data) {
+            data.forEach(row => { settings[row.key] = row.value; });
+            localStorage.setItem('lise_settings', JSON.stringify(settings));
+        }
+    } catch(err) {
+        console.error('fetchSettings error:', err);
+    }
+    return settings;
+}
+
+/**
+ * Save a single setting to Supabase.
+ * @param {string} key - Setting key
+ * @param {any} value - Setting value (will be JSON stringified if object)
+ */
+async function saveSettingInSupabase(key, value) {
+    const strValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+    // Update localStorage cache
+    const cached = localStorage.getItem('lise_settings');
+    let settings = {};
+    if (cached) try { settings = JSON.parse(cached); } catch(e) {}
+    settings[key] = strValue;
+    localStorage.setItem('lise_settings', JSON.stringify(settings));
+
+    if (!supabaseClient) return true;
+    try {
+        const { error } = await supabaseClient
+            .from('settings')
+            .upsert({ key, value: strValue, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        if (error) throw error;
+        return true;
+    } catch(err) {
+        console.error('saveSettingInSupabase error:', err);
+        return false;
+    }
+}
+
+/**
+ * Update cashbox total by adding/subtracting delta.
+ * @param {number} delta - Amount to add (positive) or subtract (negative)
+ */
+async function updateCashboxInSupabase(delta) {
+    const cached = localStorage.getItem('lise_settings');
+    let settings = {};
+    if (cached) try { settings = JSON.parse(cached); } catch(e) {}
+
+    const currentTotal = parseFloat(settings['cashbox_total'] || '0');
+    const newTotal = Math.max(0, currentTotal + delta);
+
+    return await saveSettingInSupabase('cashbox_total', newTotal.toFixed(2));
 }
 
 // Subscriptions

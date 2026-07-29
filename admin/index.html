@@ -123,6 +123,9 @@
                 <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('admins', this)">
                     <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Administradores
                 </button>
+                <button class="admin-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-bold text-xs font-label-md transition-all" onclick="switchAdminTab('settings', this)">
+                    <span class="material-symbols-outlined text-sm">settings</span> Configurações
+                </button>
             </nav>
         </div>
 
@@ -197,6 +200,16 @@
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
                         <span class="material-symbols-outlined">restaurant_menu</span>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Caixa do Dia</span>
+                        <span class="font-headline-xl text-2xl font-bold text-emerald-700" id="metric-cashbox">R$ 0,00</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined">point_of_sale</span>
                     </div>
                 </div>
             </div>
@@ -444,6 +457,155 @@
             </div>
         </div>
 
+        <!-- 9. NEW: SETTINGS SECTION -->
+        <div id="tab-settings" class="admin-tab-content space-y-8 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-xl font-bold text-primary">Configura&ccedil;&otilde;es da Loja</h3>
+                    <p class="text-xs text-on-surface-variant">Personalize o funcionamento e a experi&ecirc;ncia dos seus clientes</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Card 1: Taxa de Entrega -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-secondary text-lg">local_shipping</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Taxa de Entrega</h4>
+                            <p class="text-[11px] text-on-surface-variant">Valor cobrado por pedido entregue</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Tipo de Taxa</label>
+                            <select id="cfg-delivery-type" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" onchange="toggleDeliveryFeeField()">
+                                <option value="free">Gr&aacute;tis (sem taxa)</option>
+                                <option value="fixed" selected>Valor Fixo (R$)</option>
+                            </select>
+                        </div>
+                        <div id="delivery-fee-field">
+                            <label class="block text-xs font-bold text-primary mb-1">Valor da Taxa (R$)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">R$</span>
+                                <input type="number" step="0.01" min="0" id="cfg-delivery-fee" placeholder="5.00"
+                                    class="w-full pl-8 pr-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary font-bold" />
+                            </div>
+                        </div>
+                        <button id="btn-save-delivery" onclick="saveDeliveryFeeConfig()"
+                            class="w-full bg-secondary text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">save</span> Salvar Taxa de Entrega
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Horário de Funcionamento -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-blue-700 text-lg">schedule</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Hor&aacute;rio de Funcionamento</h4>
+                            <p class="text-[11px] text-on-surface-variant">Dias e horas que a loja aceita pedidos</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Sugest&otilde;es r&aacute;pidas:</p>
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        <button onclick="applyHoursPreset('08:00','18:00')" class="text-[11px] px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/30 hover:bg-primary hover:text-white transition-all font-bold">8h – 18h</button>
+                        <button onclick="applyHoursPreset('09:00','20:00')" class="text-[11px] px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/30 hover:bg-primary hover:text-white transition-all font-bold">9h – 20h</button>
+                        <button onclick="applyHoursPreset('11:00','22:00')" class="text-[11px] px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/30 hover:bg-primary hover:text-white transition-all font-bold">11h – 22h</button>
+                        <button onclick="applyHoursPreset('10:00','21:00')" class="text-[11px] px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/30 hover:bg-primary hover:text-white transition-all font-bold">10h – 21h</button>
+                    </div>
+
+                    <div class="space-y-2" id="hours-days-container">
+                        <!-- Days generated by JS -->
+                    </div>
+
+                    <button id="btn-save-hours" onclick="saveBusinessHoursConfig()"
+                        class="w-full mt-4 bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">save</span> Salvar Hor&aacute;rios
+                    </button>
+                </div>
+
+                <!-- Card 3: Configuração da Comanda -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-amber-700 text-lg">receipt_long</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Configura&ccedil;&atilde;o da Comanda</h4>
+                            <p class="text-[11px] text-on-surface-variant">Layout da comanda para impressora t&eacute;rmica 80mm</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Nome do Restaurante no Topo</label>
+                            <input type="text" id="cfg-receipt-name" placeholder="Lise Cozinha Fit"
+                                class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Mensagem do Rodap&eacute;</label>
+                            <input type="text" id="cfg-receipt-footer" placeholder="Obrigada pela prefer&ecirc;ncia! &#x2665;"
+                                class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                        </div>
+                        <div class="space-y-2 pt-1">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary">
+                                <input type="checkbox" id="cfg-receipt-address" checked class="rounded text-primary" /> Imprimir endere&ccedil;o do cliente
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary">
+                                <input type="checkbox" id="cfg-receipt-qty" checked class="rounded text-primary" /> Imprimir quantidade dos itens
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary">
+                                <input type="checkbox" id="cfg-receipt-code" checked class="rounded text-primary" /> Imprimir c&oacute;digo do pedido
+                            </label>
+                        </div>
+                        <button id="btn-save-receipt" onclick="saveReceiptConfig()"
+                            class="w-full bg-amber-600 text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">save</span> Salvar Config. de Comanda
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4: Notificações Sonoras -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-purple-700 text-lg">notifications_active</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Notifica&ccedil;&otilde;es Sonoras</h4>
+                            <p class="text-[11px] text-on-surface-variant">Alerta sonoro ao chegar novo pedido</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-xs text-on-surface-variant bg-surface-container rounded-xl p-3 border border-outline-variant/20">
+                            Quando um novo pedido chega, o painel toca um alerta sonoro 3 vezes e o t&iacute;tulo da p&aacute;gina pisca com "⚡ NOVO PEDIDO!". O som &eacute; gerado pelo navegador (sem arquivo externo).
+                        </p>
+                        <div>
+                            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary">
+                                <input type="checkbox" id="cfg-sound-enabled" checked class="rounded text-primary" /> Ativar alerta sonoro de novos pedidos
+                            </label>
+                        </div>
+                        <button onclick="playOrderNotification()" class="w-full bg-purple-700 text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">volume_up</span> Testar Som de Alerta
+                        </button>
+                        <button id="btn-save-sound" onclick="saveSoundConfig()"
+                            class="w-full bg-primary text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">save</span> Salvar Prefer&ecirc;ncias de Som
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -659,7 +821,8 @@
             'coupons': 'Gestão de Cupons de Desconto',
             'customers': 'Clientes Cadastrados',
             'reviews': 'Gestão de Avaliações',
-            'admins': 'Configurações & Administradores'
+            'admins': 'Configurações & Administradores',
+            'settings': 'Configurações da Loja'
         };
         document.getElementById('admin-tab-title').innerText = titles[tabId] || 'Painel de Gerenciamento';
     }
@@ -720,6 +883,17 @@
         document.getElementById('metric-active-orders').innerText = activeCount;
         document.getElementById('metric-customers').innerText = customers.length;
         document.getElementById('metric-products').innerText = adminProducts.length;
+
+        // Cashbox: sum of paid orders (preparando, saiu_entrega, entregue)
+        const cashboxEl = document.getElementById('metric-cashbox');
+        if (cashboxEl) {
+            if (typeof fetchSettingsFromSupabase === 'function') {
+                fetchSettingsFromSupabase().then(s => {
+                    const cashbox = parseFloat(s['cashbox_total'] || '0');
+                    cashboxEl.innerText = `R$ ${cashbox.toFixed(2).replace('.', ',')}`;
+                });
+            }
+        }
     }
 
     async function handleSaveWhatsAppNumber(e) {
@@ -743,7 +917,7 @@
         const fullBody = document.getElementById('full-orders-table');
 
         if (!adminOrders || adminOrders.length === 0) {
-            const emptyHTML = `<tr><td colspan="6" class="py-6 text-center text-on-surface-variant italic">Nenhum pedido registrado até o momento.</td></tr>`;
+            const emptyHTML = `<tr><td colspan="7" class="py-6 text-center text-on-surface-variant italic">Nenhum pedido registrado até o momento.</td></tr>`;
             if (overviewBody) overviewBody.innerHTML = emptyHTML;
             if (fullBody) fullBody.innerHTML = emptyHTML;
             return;
@@ -751,14 +925,18 @@
 
         const renderRows = (limit = null) => {
             const list = limit ? adminOrders.slice(0, limit) : adminOrders;
-            return list.map(o => `
-                <tr class="hover:bg-surface-container/50">
+            return list.map(o => {
+                const addrLine = [o.delivery_address, o.address_complement].filter(Boolean).join(' — ');
+                return `
+                <tr class="hover:bg-surface-container/50 ${o.status === 'aguardando_pagamento' || o.status === 'pending' ? 'bg-yellow-50/50' : ''}">
                     <td class="py-3 px-3 font-bold text-primary">${o.code}</td>
                     <td class="py-3 px-3">
                         <span class="font-bold text-primary block">${o.customer_name}</span>
                         <span class="text-[11px] text-on-surface-variant">${o.customer_phone}</span>
                     </td>
-                    <td class="py-3 px-3 text-on-surface-variant max-w-xs truncate">${o.delivery_address}</td>
+                    <td class="py-3 px-3 text-on-surface-variant max-w-[160px]">
+                        <span class="block text-xs break-words leading-snug">${addrLine || '--'}</span>
+                    </td>
                     <td class="py-3 px-3 font-bold text-primary">R$ ${parseFloat(o.total_amount).toFixed(2).replace('.', ',')}</td>
                     <td class="py-3 px-3">
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusBadgeClass(o.status)}">
@@ -766,14 +944,10 @@
                         </span>
                     </td>
                     <td class="py-3 px-3 text-right">
-                        <div class="inline-flex gap-1">
-                            <button onclick="changeOrderStatus('${o.id}', 'cooking')" title="Cozinha" class="px-2 py-1 bg-amber-100 text-amber-800 rounded font-bold hover:bg-amber-200">Cozinha</button>
-                            <button onclick="changeOrderStatus('${o.id}', 'delivering')" title="Entrega" class="px-2 py-1 bg-blue-100 text-blue-800 rounded font-bold hover:bg-blue-200">Entrega</button>
-                            <button onclick="changeOrderStatus('${o.id}', 'delivered')" title="Concluído" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold hover:bg-emerald-200">Concluído</button>
-                        </div>
+                        ${getNextStatusButtons(o)}
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         };
 
         if (overviewBody) overviewBody.innerHTML = renderRows(5);
@@ -782,11 +956,16 @@
 
     function getStatusBadgeClass(status) {
         switch (status) {
+            case 'aguardando_pagamento': return 'bg-yellow-100 text-yellow-800';
+            case 'preparando': return 'bg-amber-100 text-amber-800';
             case 'pending': return 'bg-yellow-100 text-yellow-800';
             case 'confirmed': return 'bg-blue-100 text-blue-800';
             case 'cooking': return 'bg-amber-100 text-amber-800';
+            case 'saiu_entrega': return 'bg-purple-100 text-purple-800';
             case 'delivering': return 'bg-purple-100 text-purple-800';
+            case 'entregue': return 'bg-emerald-100 text-emerald-800';
             case 'delivered': return 'bg-emerald-100 text-emerald-800';
+            case 'cancelado': return 'bg-red-100 text-red-800';
             case 'cancelled': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
@@ -794,24 +973,98 @@
 
     function getStatusLabel(status) {
         switch (status) {
-            case 'pending': return 'Pendente';
-            case 'confirmed': return 'Confirmado';
-            case 'cooking': return 'Cozinha';
-            case 'delivering': return 'Saiu p/ Entrega';
-            case 'delivered': return 'Entregue';
-            case 'cancelled': return 'Cancelado';
+            case 'aguardando_pagamento': return '💳 Aguardando Pagamento';
+            case 'preparando': return '🍳 Preparando na Cozinha';
+            case 'saiu_entrega': return '🛵 Saiu p/ Entrega';
+            case 'entregue': return '✅ Entregue';
+            case 'cancelado': return '❌ Cancelado';
+            // Legacy
+            case 'pending': return '💳 Aguardando Pagamento';
+            case 'confirmed': return '✔️ Confirmado';
+            case 'cooking': return '🍳 Preparando';
+            case 'delivering': return '🛵 Saiu p/ Entrega';
+            case 'delivered': return '✅ Entregue';
+            case 'cancelled': return '❌ Cancelado';
             default: return status;
         }
+    }
+
+    function getNextStatusButtons(order) {
+        const s = order.status;
+        const id = order.id;
+        const amount = parseFloat(order.total_amount || 0);
+        const isPaid = ['preparando', 'saiu_entrega', 'entregue', 'cooking', 'delivering', 'delivered'].includes(s);
+        const isFinal = ['entregue', 'cancelado', 'delivered', 'cancelled'].includes(s);
+
+        if (isFinal) {
+            return `<span class="text-[10px] text-on-surface-variant italic">Pedido finalizado</span>`;
+        }
+
+        let html = '<div class="inline-flex flex-wrap gap-1">';
+
+        if (s === 'aguardando_pagamento' || s === 'pending') {
+            html += `<button onclick="confirmOrderPayment('${id}', ${amount})" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold text-xs hover:bg-emerald-200 flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">payments</span>Confirmar Pagto</button>`;
+        }
+        if (s === 'preparando' || s === 'confirmed' || s === 'cooking') {
+            html += `<button onclick="changeOrderStatus('${id}', 'saiu_entrega')" class="px-2 py-1 bg-purple-100 text-purple-800 rounded font-bold text-xs hover:bg-purple-200">Saiu p/ Entrega</button>`;
+        }
+        if (s === 'saiu_entrega' || s === 'delivering') {
+            html += `<button onclick="changeOrderStatus('${id}', 'entregue')" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-bold text-xs hover:bg-emerald-200">✅ Entregue</button>`;
+        }
+
+        // Print button
+        html += `<button onclick="printOrderReceipt('${id}')" title="Imprimir Comanda" class="px-2 py-1 bg-surface-container text-primary rounded font-bold text-xs hover:bg-surface-container-high flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">print</span>Imprimir</button>`;
+
+        // Cancel button (if not already final)
+        html += `<button onclick="cancelOrder('${id}', ${isPaid ? amount : 0})" class="px-2 py-1 bg-red-50 text-red-700 rounded font-bold text-xs hover:bg-red-100">Cancelar</button>`;
+
+        html += '</div>';
+        return html;
     }
 
     async function changeOrderStatus(orderId, newStatus) {
         if (typeof updateOrderStatusInSupabase === 'function') {
             const ok = await updateOrderStatusInSupabase(orderId, newStatus);
             if (ok) {
-                showToast(`Status atualizado para ${getStatusLabel(newStatus)}!`, 'success');
+                showToast(`Status atualizado: ${getStatusLabel(newStatus)}!`, 'success');
                 loadAdminData();
             }
         }
+    }
+
+    /** Confirm payment: change status to preparando + sum to cashbox */
+    async function confirmOrderPayment(orderId, amount) {
+        if (!confirm(`Confirmar pagamento de R$ ${amount.toFixed(2).replace('.', ',')}? O valor será somado à caixa.`)) return;
+
+        const ok1 = typeof updateOrderStatusInSupabase === 'function'
+            ? await updateOrderStatusInSupabase(orderId, 'preparando')
+            : false;
+
+        if (ok1 && typeof updateCashboxInSupabase === 'function') {
+            await updateCashboxInSupabase(amount);
+        }
+
+        showToast(`💰 Pagamento confirmado! R$ ${amount.toFixed(2).replace('.', ',')} somado à caixa.`, 'success');
+        loadAdminData();
+    }
+
+    /** Cancel order: change to cancelado + deduct if already paid */
+    async function cancelOrder(orderId, paidAmount) {
+        const msg = paidAmount > 0
+            ? `Cancelar pedido? R$ ${paidAmount.toFixed(2).replace('.', ',')} será descontado da caixa (já foi pago).`
+            : 'Cancelar pedido?';
+        if (!confirm(msg)) return;
+
+        const ok1 = typeof updateOrderStatusInSupabase === 'function'
+            ? await updateOrderStatusInSupabase(orderId, 'cancelado')
+            : false;
+
+        if (ok1 && paidAmount > 0 && typeof updateCashboxInSupabase === 'function') {
+            await updateCashboxInSupabase(-paidAmount);
+        }
+
+        showToast(`Pedido cancelado.${paidAmount > 0 ? ' Valor removido da caixa.' : ''}`, 'success');
+        loadAdminData();
     }
 
     function renderAdminProducts() {
@@ -1274,12 +1527,351 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         checkAdminAuthView();
+
+        // New order sound notification via Realtime
+        let _knownOrderIds = new Set();
         if (typeof subscribeToOrdersRealtime === 'function') {
-            subscribeToOrdersRealtime(() => {
-                if (isAdminLoggedIn()) loadAdminData();
+            subscribeToOrdersRealtime((payload) => {
+                if (isAdminLoggedIn()) {
+                    loadAdminData();
+                    // Notify only for brand-new inserts
+                    if (payload && payload.eventType === 'INSERT') {
+                        const soundEnabled = document.getElementById('cfg-sound-enabled');
+                        if (!soundEnabled || soundEnabled.checked) {
+                            playOrderNotification();
+                        }
+                        showNewOrderBanner(payload.new);
+                    }
+                }
             });
         }
+
+        initSettingsTab();
     });
+
+    // =============================================
+    // SOUND NOTIFICATION
+    // =============================================
+    let _titleBlinkInterval = null;
+
+    function playOrderNotification() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            const playBeep = (delay, freq = 880, duration = 0.18) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.6, ctx.currentTime + delay + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + duration);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + duration + 0.05);
+            };
+
+            // 3 beeps
+            playBeep(0, 880);
+            playBeep(0.28, 1100);
+            playBeep(0.56, 880);
+            playBeep(0.84, 1100);
+            playBeep(1.12, 1320);
+
+        } catch(e) { console.warn('Audio notification failed:', e); }
+
+        // Blink page title
+        if (_titleBlinkInterval) clearInterval(_titleBlinkInterval);
+        const origTitle = document.title;
+        let blink = 0;
+        _titleBlinkInterval = setInterval(() => {
+            document.title = blink % 2 === 0 ? '\u26a1 NOVO PEDIDO!' : origTitle;
+            blink++;
+            if (blink > 14) {
+                clearInterval(_titleBlinkInterval);
+                document.title = origTitle;
+                _titleBlinkInterval = null;
+            }
+        }, 600);
+    }
+
+    function showNewOrderBanner(order) {
+        const banner = document.createElement('div');
+        banner.className = 'fixed top-4 right-4 z-[200] bg-primary text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce border border-white/20';
+        banner.innerHTML = `
+            <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings:'FILL' 1">notifications_active</span>
+            <div>
+                <p class="font-bold text-sm">⚡ Novo Pedido Recebido!</p>
+                <p class="text-xs text-white/80">${order ? order.customer_name + ' — R$ ' + parseFloat(order.total_amount || 0).toFixed(2).replace('.', ',') : ''}</p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-2 text-white/70 hover:text-white">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        `;
+        document.body.appendChild(banner);
+        setTimeout(() => banner.remove(), 8000);
+    }
+
+    // =============================================
+    // THERMAL PRINT RECEIPT
+    // =============================================
+    async function printOrderReceipt(orderId) {
+        const order = adminOrders.find(o => o.id === orderId);
+        if (!order) { alert('Pedido não encontrado.'); return; }
+
+        // Read receipt config
+        let cfg = {};
+        if (typeof fetchSettingsFromSupabase === 'function') {
+            const s = await fetchSettingsFromSupabase();
+            try { cfg = s['receipt_config'] ? JSON.parse(s['receipt_config']) : {}; } catch(e) {}
+        }
+
+        const storeName = cfg.name || 'Lise Cozinha Fit';
+        const footer = cfg.footer || 'Obrigada pela preferência! ♥';
+        const showAddress = cfg.show_address !== false;
+        const showQty = cfg.show_qty !== false;
+        const showCode = cfg.show_code !== false;
+
+        let items = [];
+        if (typeof order.items === 'string') { try { items = JSON.parse(order.items); } catch(e) {} }
+        else if (Array.isArray(order.items)) { items = order.items; }
+
+        const now = new Date().toLocaleString('pt-BR');
+        const sep = '-'.repeat(32);
+
+        let receiptHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Comanda #${order.code}</title>
+<style>
+  @page { size: 80mm auto; margin: 4mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; width: 72mm; }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .sep { border-top: 1px dashed #000; margin: 6px 0; }
+  .row { display: flex; justify-content: space-between; margin: 2px 0; }
+  .big { font-size: 15px; font-weight: bold; }
+  .sm { font-size: 10px; }
+</style>
+</head>
+<body>
+<div class="center bold big">${storeName}</div>
+<div class="center sm">Cozinha Saudável</div>
+<div class="sep"></div>`;
+
+        if (showCode) {
+            receiptHTML += `<div class="center sm">Pedido: <b>#${order.code}</b></div>`;
+        }
+        receiptHTML += `<div class="center sm">${now}</div>`;
+        receiptHTML += `<div class="center bold">${order.customer_name}</div>`;
+        receiptHTML += `<div class="center sm">${order.customer_phone}</div>`;
+        receiptHTML += `<div class="sep"></div>`;
+        receiptHTML += `<div class="bold">ITENS:</div>`;
+
+        if (items.length > 0) {
+            items.forEach(item => {
+                const price = parseFloat(item.price || 0);
+                const qty = item.quantity || 1;
+                const total = price * qty;
+                receiptHTML += `<div class="row">`;
+                if (showQty) {
+                    receiptHTML += `<span>${qty}x ${item.name}</span><span>R$${total.toFixed(2).replace('.',',')}</span>`;
+                } else {
+                    receiptHTML += `<span>${item.name}</span><span>R$${total.toFixed(2).replace('.',',')}</span>`;
+                }
+                receiptHTML += `</div>`;
+            });
+        } else {
+            receiptHTML += `<div class="sm">Itens não disponíveis</div>`;
+        }
+
+        receiptHTML += `<div class="sep"></div>`;
+        receiptHTML += `<div class="row bold big"><span>TOTAL</span><span>R$${parseFloat(order.total_amount).toFixed(2).replace('.',',')}</span></div>`;
+        receiptHTML += `<div class="sep"></div>`;
+
+        if (showAddress && order.delivery_address) {
+            receiptHTML += `<div class="bold">ENTREGA:</div>`;
+            receiptHTML += `<div class="sm">${order.delivery_address}</div>`;
+            if (order.address_complement) {
+                receiptHTML += `<div class="sm">${order.address_complement}</div>`;
+            }
+            receiptHTML += `<div class="sep"></div>`;
+        }
+
+        receiptHTML += `<div class="center sm">${footer}</div>`;
+        receiptHTML += `</body></html>`;
+
+        const win = window.open('', '_blank', 'width=340,height=600');
+        win.document.write(receiptHTML);
+        win.document.close();
+        win.focus();
+        setTimeout(() => { win.print(); win.close(); }, 500);
+    }
+
+    // =============================================
+    // SETTINGS TAB LOGIC
+    // =============================================
+
+    /** Generic save button state handler */
+    function setSaveBtnState(btnId, state) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        const origMap = { 'btn-save-delivery': '<span class="material-symbols-outlined text-sm">save</span> Salvar Taxa de Entrega', 'btn-save-hours': '<span class="material-symbols-outlined text-sm">save</span> Salvar Horários', 'btn-save-receipt': '<span class="material-symbols-outlined text-sm">save</span> Salvar Config. de Comanda', 'btn-save-sound': '<span class="material-symbols-outlined text-sm">save</span> Salvar Preferências de Som' };
+        if (state === 'saving') {
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Salvando...';
+            btn.disabled = true;
+        } else if (state === 'saved') {
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Salvo com sucesso!';
+            btn.classList.add('bg-emerald-600');
+            btn.disabled = false;
+            setTimeout(() => { btn.innerHTML = origMap[btnId] || 'Salvar'; btn.classList.remove('bg-emerald-600'); }, 2500);
+        } else if (state === 'error') {
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm">error</span> Erro ao salvar';
+            btn.classList.add('bg-red-600');
+            btn.disabled = false;
+            setTimeout(() => { btn.innerHTML = origMap[btnId] || 'Salvar'; btn.classList.remove('bg-red-600'); }, 2500);
+        }
+    }
+
+    function toggleDeliveryFeeField() {
+        const type = document.getElementById('cfg-delivery-type')?.value;
+        const field = document.getElementById('delivery-fee-field');
+        if (field) field.classList.toggle('hidden', type === 'free');
+    }
+
+    async function saveDeliveryFeeConfig() {
+        setSaveBtnState('btn-save-delivery', 'saving');
+        const type = document.getElementById('cfg-delivery-type')?.value || 'fixed';
+        const fee = document.getElementById('cfg-delivery-fee')?.value || '0';
+        const value = { type, fee: type === 'free' ? '0' : fee };
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('delivery_fee', JSON.stringify(value))
+            : false;
+        setSaveBtnState('btn-save-delivery', ok ? 'saved' : 'error');
+    }
+
+    const DAYS_PT = ['☀️ Domingo', '🟢 Segunda', '🟢 Terça', '🟢 Quarta', '🟢 Quinta', '🟢 Sexta', '🟡 Sábado'];
+    const DAYS_KEY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+    function initHoursDays(hoursData = {}) {
+        const container = document.getElementById('hours-days-container');
+        if (!container) return;
+        container.innerHTML = DAYS_PT.map((label, i) => {
+            const key = DAYS_KEY[i];
+            const day = hoursData[key] || { open: i >= 1 && i <= 5, from: '09:00', to: '18:00' };
+            return `
+                <div class="flex items-center gap-2 text-xs">
+                    <input type="checkbox" id="day-${key}" ${day.open ? 'checked' : ''} class="rounded text-primary flex-shrink-0" />
+                    <label for="day-${key}" class="w-28 font-bold text-primary cursor-pointer">${label}</label>
+                    <input type="time" id="from-${key}" value="${day.from || '09:00'}" class="px-2 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-xs focus:outline-none" />
+                    <span class="text-on-surface-variant">até</span>
+                    <input type="time" id="to-${key}" value="${day.to || '18:00'}" class="px-2 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-xs focus:outline-none" />
+                </div>
+            `;
+        }).join('');
+    }
+
+    function applyHoursPreset(from, to) {
+        DAYS_KEY.forEach(key => {
+            const fromEl = document.getElementById(`from-${key}`);
+            const toEl = document.getElementById(`to-${key}`);
+            if (fromEl) fromEl.value = from;
+            if (toEl) toEl.value = to;
+        });
+    }
+
+    async function saveBusinessHoursConfig() {
+        setSaveBtnState('btn-save-hours', 'saving');
+        const hours = {};
+        DAYS_KEY.forEach(key => {
+            hours[key] = {
+                open: !!(document.getElementById(`day-${key}`)?.checked),
+                from: document.getElementById(`from-${key}`)?.value || '09:00',
+                to: document.getElementById(`to-${key}`)?.value || '18:00'
+            };
+        });
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('business_hours', JSON.stringify(hours))
+            : false;
+        setSaveBtnState('btn-save-hours', ok ? 'saved' : 'error');
+    }
+
+    async function saveReceiptConfig() {
+        setSaveBtnState('btn-save-receipt', 'saving');
+        const cfg = {
+            name: document.getElementById('cfg-receipt-name')?.value || 'Lise Cozinha Fit',
+            footer: document.getElementById('cfg-receipt-footer')?.value || 'Obrigada pela preferência!',
+            show_address: !!(document.getElementById('cfg-receipt-address')?.checked),
+            show_qty: !!(document.getElementById('cfg-receipt-qty')?.checked),
+            show_code: !!(document.getElementById('cfg-receipt-code')?.checked)
+        };
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('receipt_config', JSON.stringify(cfg))
+            : false;
+        setSaveBtnState('btn-save-receipt', ok ? 'saved' : 'error');
+    }
+
+    async function saveSoundConfig() {
+        setSaveBtnState('btn-save-sound', 'saving');
+        const enabled = !!(document.getElementById('cfg-sound-enabled')?.checked);
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('sound_enabled', String(enabled))
+            : false;
+        setSaveBtnState('btn-save-sound', ok ? 'saved' : 'error');
+    }
+
+    async function initSettingsTab() {
+        if (typeof fetchSettingsFromSupabase !== 'function') return;
+        const s = await fetchSettingsFromSupabase();
+
+        // Delivery fee
+        if (s['delivery_fee']) {
+            try {
+                const df = JSON.parse(s['delivery_fee']);
+                const typeEl = document.getElementById('cfg-delivery-type');
+                const feeEl = document.getElementById('cfg-delivery-fee');
+                if (typeEl) typeEl.value = df.type || 'fixed';
+                if (feeEl) feeEl.value = df.fee || '';
+                toggleDeliveryFeeField();
+            } catch(e) {}
+        }
+
+        // Business hours
+        let hoursData = {};
+        if (s['business_hours']) {
+            try { hoursData = JSON.parse(s['business_hours']); } catch(e) {}
+        }
+        initHoursDays(hoursData);
+
+        // Receipt config
+        if (s['receipt_config']) {
+            try {
+                const rc = JSON.parse(s['receipt_config']);
+                const n = document.getElementById('cfg-receipt-name');
+                const f = document.getElementById('cfg-receipt-footer');
+                const a = document.getElementById('cfg-receipt-address');
+                const q = document.getElementById('cfg-receipt-qty');
+                const c = document.getElementById('cfg-receipt-code');
+                if (n) n.value = rc.name || '';
+                if (f) f.value = rc.footer || '';
+                if (a) a.checked = rc.show_address !== false;
+                if (q) q.checked = rc.show_qty !== false;
+                if (c) c.checked = rc.show_code !== false;
+            } catch(e) {}
+        }
+
+        // Sound
+        if (s['sound_enabled'] !== undefined) {
+            const se = document.getElementById('cfg-sound-enabled');
+            if (se) se.checked = s['sound_enabled'] !== 'false';
+        }
+    }
 </script>
 </body>
 </html>

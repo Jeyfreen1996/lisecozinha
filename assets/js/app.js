@@ -434,11 +434,12 @@ function renderCartAddressPanel(addr) {
         const cityState = [addr.city, addr.state].filter(Boolean).join(' - ');
         panel.innerHTML = `
             <div class="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start justify-between gap-2 mb-1">
-                <div class="flex items-start gap-2.5">
-                    <span class="material-symbols-outlined text-primary text-base mt-0.5" style="font-variation-settings:'FILL' 1">location_on</span>
+                <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="material-symbols-outlined text-primary text-base mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1">location_on</span>
                     <div class="min-w-0">
                         <p class="text-[10px] font-bold text-primary uppercase tracking-wide">${addr.label || 'Entrega'}</p>
-                        <p class="text-xs font-medium text-on-surface truncate">${addr.street_address}</p>
+                        <p class="text-xs font-medium text-on-surface break-words leading-snug">${addr.street_address}</p>
+                        ${addr.complement ? `<p class="text-[11px] text-on-surface-variant break-words">${addr.complement}</p>` : ''}
                         ${cityState ? `<p class="text-[11px] text-on-surface-variant">${cityState}</p>` : ''}
                     </div>
                 </div>
@@ -483,6 +484,12 @@ function renderCartAddressPanel(addr) {
                     <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">search</span>
                     <div id="cart-address-suggestions" class="absolute top-full left-0 right-0 bg-white border border-outline-variant/30 rounded-xl shadow-xl z-50 mt-1 overflow-hidden hidden"></div>
                 </div>
+
+                <input type="text" id="cart-address-complement"
+                    placeholder="Complemento: apto, andar, referência, ponto de referência..."
+                    class="w-full px-3 py-2.5 rounded-xl bg-white border border-outline-variant/40 text-xs focus:outline-none focus:border-primary mt-2"
+                    autocomplete="off"
+                />
 
                 <button onclick="confirmCartAddress()" id="cart-save-addr-btn"
                     class="w-full mt-2.5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95 hidden">
@@ -647,6 +654,8 @@ async function useMyLocationForCart() {
 /** Confirm and save the pending cart address */
 async function confirmCartAddress() {
     const input = document.getElementById('cart-address-input');
+    const complementInput = document.getElementById('cart-address-complement');
+    const complement = complementInput ? complementInput.value.trim() : '';
     let addrToSave = _pendingCartAddress;
 
     // If user typed manually without selecting a suggestion
@@ -663,6 +672,9 @@ async function confirmCartAddress() {
         showToast('Digite ou selecione um endereço primeiro.', 'warning');
         return;
     }
+
+    // Add complement
+    addrToSave.complement = complement;
 
     const saveBtn = document.getElementById('cart-save-addr-btn');
     if (saveBtn) {
