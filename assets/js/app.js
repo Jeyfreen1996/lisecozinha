@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     injectToastContainerHTML();
     renderCart();
     checkStoreStatus();
+    updateActiveOrdersBadge();
 });
 
 // Dynamic Store Open/Closed Badge Status
@@ -83,6 +84,32 @@ async function checkStoreStatus() {
     }
 
     return isOpen;
+}
+
+// Active Orders Notification Badge
+async function updateActiveOrdersBadge() {
+    if (typeof isUserLoggedIn === 'function' && !isUserLoggedIn()) return;
+    if (typeof fetchActiveOrdersFromSupabase !== 'function') return;
+
+    try {
+        const activeOrders = await fetchActiveOrdersFromSupabase();
+        const hasActive = activeOrders && activeOrders.length > 0;
+        
+        const dots = [
+            document.getElementById('desktop-nav-active-order-dot'),
+            document.getElementById('drawer-nav-active-order-dot'),
+            document.getElementById('bottom-nav-active-order-dot')
+        ];
+
+        dots.forEach(dot => {
+            if (dot) {
+                if (hasActive) dot.classList.remove('hidden');
+                else dot.classList.add('hidden');
+            }
+        });
+    } catch(e) {
+        console.warn('Error checking active orders:', e);
+    }
 }
 
 // Save cart state

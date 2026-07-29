@@ -113,7 +113,10 @@
         <nav class="hidden md:flex items-center gap-6">
             <a href="/" class="text-sm font-label-md text-primary font-bold hover:text-primary transition-colors">Início</a>
             <a href="/cardapio" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Cardápio</a>
-            <a href="/pedidos" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Meus Pedidos</a>
+            <a href="/pedidos" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors relative">
+                Meus Pedidos
+                <span id="desktop-nav-active-order-dot" class="absolute -top-1 -right-2 w-2 h-2 bg-red-600 rounded-full hidden"></span>
+            </a>
             <a href="/avaliacoes" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Avaliações</a>
             <a href="/perfil" class="text-sm font-label-md text-on-surface-variant hover:text-primary transition-colors">Perfil</a>
             <a href="/admin" class="text-xs font-bold bg-primary/10 text-primary px-3 py-1.5 rounded-full hover:bg-primary/20 transition-all flex items-center gap-1">
@@ -148,9 +151,10 @@
             <span class="material-symbols-outlined">restaurant_menu</span>
             <span class="font-label-md">Cardápio Completo</span>
         </a>
-        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/pedidos">
+        <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors relative" href="/pedidos">
             <span class="material-symbols-outlined">receipt_long</span>
             <span class="font-label-md">Meus Pedidos</span>
+            <span id="drawer-nav-active-order-dot" class="absolute right-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-red-600 rounded-full hidden"></span>
         </a>
         <a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-low transition-colors" href="/avaliacoes">
             <span class="material-symbols-outlined">reviews</span>
@@ -457,8 +461,11 @@
         </div>
         <span class="text-[10px] font-label-md">Carrinho</span>
     </button>
-    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/pedidos" data-nav="pedidos">
-        <span class="material-symbols-outlined">receipt_long</span>
+    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1 relative" href="/pedidos" data-nav="pedidos">
+        <div class="relative">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span id="bottom-nav-active-order-dot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-600 border-2 border-surface rounded-full hidden"></span>
+        </div>
         <span class="text-[10px] font-label-md">Pedidos</span>
     </a>
     <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
