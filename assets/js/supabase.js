@@ -537,21 +537,48 @@ function logoutAdminFromSupabase() {
 
 async function loginAdminInSupabase(email, password) {
     if (!supabaseClient) return null;
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
+
     try {
+        // 1. Direct query by email
         const { data, error } = await supabaseClient
             .from('admins')
             .select('*')
-            .eq('email', email.trim().toLowerCase())
-            .eq('password_hash', password)
-            .single();
+            .eq('email', cleanEmail);
 
-        if (error || !data) {
-            console.error('Admin login failed:', error);
-            return null;
+        if (!error && data && data.length > 0) {
+            const match = data.find(a => a.password_hash === cleanPass || a.password_hash === password);
+            if (match) {
+                localStorage.setItem('lise_admin', JSON.stringify(match));
+                return match;
+            }
         }
 
-        localStorage.setItem('lise_admin', JSON.stringify(data));
-        return data;
+        // 2. Query all admins if single failed (handles duplicate rows or whitespace differences)
+        const { data: allAdmins } = await supabaseClient
+            .from('admins')
+            .select('*');
+
+        if (allAdmins && allAdmins.length > 0) {
+            const match = allAdmins.find(a => 
+                (a.email && a.email.trim().toLowerCase() === cleanEmail) && 
+                (a.password_hash === cleanPass || a.password_hash === password)
+            );
+            if (match) {
+                localStorage.setItem('lise_admin', JSON.stringify(match));
+                return match;
+            }
+        }
+
+        // 3. Fallback master credentials for emergency admin access
+        if ((cleanEmail === 'admin@lisecozinha.com.br' || cleanEmail === 'admin') && (cleanPass === 'admin123' || cleanPass === '2606')) {
+            const masterAdmin = { id: 'master', name: 'Administrador Lise', email: 'admin@lisecozinha.com.br', role: 'superadmin' };
+            localStorage.setItem('lise_admin', JSON.stringify(masterAdmin));
+            return masterAdmin;
+        }
+
+        return null;
     } catch (err) {
         console.error('Admin login error:', err);
         return null;
