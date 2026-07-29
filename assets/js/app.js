@@ -23,9 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Dynamic Store Open/Closed Badge Status
 async function checkStoreStatus() {
-    const badge = document.getElementById('store-status-badge');
-    if (!badge) return;
-
     let settings = {};
     if (typeof fetchSettingsFromSupabase === 'function') {
         settings = await fetchSettingsFromSupabase() || {};
@@ -34,31 +31,58 @@ async function checkStoreStatus() {
         if (cached) try { settings = JSON.parse(cached); } catch(e) {}
     }
 
-    if (!settings['business_hours']) return;
-    
-    try {
-        const hours = typeof settings['business_hours'] === 'object' 
-            ? settings['business_hours'] 
-            : JSON.parse(settings['business_hours']);
+    let isOpen = true; // Default open if no config
 
-        const now = new Date();
-        const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-        const todayKey = days[now.getDay()];
-        const todayConfig = hours[todayKey];
+    if (settings['business_hours']) {
+        try {
+            const hours = typeof settings['business_hours'] === 'object' 
+                ? settings['business_hours'] 
+                : JSON.parse(settings['business_hours']);
 
-        const currentTimeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const now = new Date();
+            const days = ['sun','mon','tue','wed','thu','fri','sat'];
+            const todayKey = days[now.getDay()];
+            const todayConfig = hours[todayKey];
 
+            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            if (todayConfig && todayConfig.open && currentTimeStr >= todayConfig.from && currentTimeStr <= todayConfig.to) {
+                isOpen = true;
+            } else {
+                isOpen = false;
+            }
+        } catch(e) {
+            console.warn('Error checking store status', e);
+        }
+    }
+
+    // Main Page Badge
+    const badge = document.getElementById('store-status-badge');
+    if (badge) {
         badge.classList.remove('hidden');
-        if (todayConfig && todayConfig.open && currentTimeStr >= todayConfig.from && currentTimeStr <= todayConfig.to) {
+        if (isOpen) {
             badge.innerText = 'Loja Aberta';
             badge.className = 'text-[9px] px-2 py-0.5 rounded-full font-bold uppercase mt-0.5 inline-block bg-emerald-100 text-emerald-800 border border-emerald-300';
         } else {
             badge.innerText = 'Loja Fechada';
             badge.className = 'text-[9px] px-2 py-0.5 rounded-full font-bold uppercase mt-0.5 inline-block bg-red-100 text-red-800 border border-red-300';
         }
-    } catch(e) {
-        console.warn('Error checking store status', e);
     }
+
+    // Cart Drawer Badge
+    const cartBadge = document.getElementById('cart-store-status-badge');
+    if (cartBadge) {
+        cartBadge.classList.remove('hidden');
+        if (isOpen) {
+            cartBadge.innerHTML = '<span class="material-symbols-outlined text-[14px]">storefront</span> Loja Aberta - Aceitando Pedidos';
+            cartBadge.className = 'flex items-center justify-center gap-1.5 p-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 mt-3 mx-5';
+        } else {
+            cartBadge.innerHTML = '<span class="material-symbols-outlined text-[14px]">storefront</span> Loja Fechada - Pedidos para o próximo dia útil';
+            cartBadge.className = 'flex items-center justify-center gap-1.5 p-2 bg-red-50 text-red-700 text-xs font-bold rounded-xl border border-red-200 mt-3 mx-5';
+        }
+    }
+
+    return isOpen;
 }
 
 // Save cart state
@@ -352,8 +376,22 @@ function toggleDrawer() {
 }
 
 // WhatsApp & Supabase Checkout
+let isCheckingOut = false;
+
 async function checkout() {
+    if (isCheckingOut) return;
     if (cart.length === 0) return alert("Seu carrinho está vazio! Escolha refeições no cardápio.");
+    
+    isCheckingOut = true;
+    const checkoutBtn = document.getElementById('cart-checkout-btn');
+    const originalBtnHtml = checkoutBtn ? checkoutBtn.innerHTML : '';
+    
+    if (checkoutBtn) {
+        checkoutBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Finalizando...';
+        checkoutBtn.disabled = true;
+    }
+
+    try {
 
     // Check for delivery address first
     const activeAddr = typeof getActiveDeliveryAddress === 'function'
@@ -364,6 +402,11 @@ async function checkout() {
         // Show address config panel and block checkout
         showToast('Configure seu endereço de entrega antes de finalizar!', 'warning');
         switchCartAddressMode('edit');
+        if (checkoutBtn) {
+            checkoutBtn.innerHTML = originalBtnHtml;
+            checkoutBtn.disabled = false;
+        }
+        isCheckingOut = false;
         return;
     }
 
@@ -432,7 +475,9 @@ async function checkout() {
         ? await fetchWhatsAppNumberFromSupabase()
         : (typeof WHATSAPP_NUMBER !== 'undefined' ? WHATSAPP_NUMBER : '554898591226');
 
-    window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`, '_blank');
+    const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
     clearCart();
     toggleCart();
 
@@ -447,6 +492,23 @@ async function checkout() {
         });
     } else {
         showToast(`Pedido ${orderCode} enviado para o WhatsApp! Aguardando pagamento.`, 'success');
+    }
+
+    if (checkoutBtn) {
+        checkoutBtn.innerHTML = originalBtnHtml;
+        checkoutBtn.disabled = false;
+    }
+    isCheckingOut = false;
+
+    } catch (error) {
+        console.error("Checkout error:", error);
+        showToast('Ocorreu um erro ao finalizar o pedido.', 'error');
+        const checkoutBtn = document.getElementById('cart-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.innerHTML = '<span class="material-symbols-outlined">chat</span> Finalizar no WhatsApp';
+            checkoutBtn.disabled = false;
+        }
+        isCheckingOut = false;
     }
 }
 
@@ -605,6 +667,8 @@ function injectCartDrawerHTML() {
                 </div>
                 <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container p-1 rounded-full transition-colors" onclick="toggleCart()">close</button>
             </div>
+
+            <div id="cart-store-status-badge" class="hidden"></div>
 
             <!-- Delivery Address Panel -->
             <div id="cart-address-panel" class="px-5 pt-4 flex-shrink-0">
