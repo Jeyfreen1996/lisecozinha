@@ -1126,19 +1126,19 @@ async function saveSettingInSupabase(key, value) {
     localStorage.setItem('lise_settings', JSON.stringify(settings));
 
     // Try Supabase (optional - table may not exist yet)
-    if (!supabaseClient) return true; // localStorage is enough
-    try {
-        const { error } = await supabaseClient
-            .from('settings')
-            .upsert({ key, value: strValue, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-        if (error) {
-            // Table might not exist yet - that's OK, localStorage is the fallback
-            console.warn('settings table not available, using localStorage only:', error.message);
+    if (supabaseClient) {
+        try {
+            const { error } = await supabaseClient
+                .from('settings')
+                .upsert({ key, value: strValue, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+            if (error) {
+                console.warn('saveSettingInSupabase notice:', error.message);
+            }
+        } catch(err) {
+            console.warn('saveSettingInSupabase Supabase error (localStorage fallback used):', err);
         }
-    } catch(err) {
-        console.warn('saveSettingInSupabase Supabase error (localStorage OK):', err);
     }
-    return true; // Always success if localStorage worked
+    return true; // Always return true because localStorage save succeeded
 }
 
 /**
@@ -1154,6 +1154,33 @@ async function updateCashboxInSupabase(delta) {
     const newTotal = Math.max(0, currentTotal + delta);
 
     return await saveSettingInSupabase('cashbox_total', newTotal.toFixed(2));
+}
+
+/**
+ * Permanently delete an order and its items from Supabase.
+ * @param {string} orderId - Order ID
+ */
+async function deleteOrderFromSupabase(orderId) {
+    if (!supabaseClient) return true;
+    try {
+        // Delete order items first
+        await supabaseClient
+            .from('order_items')
+            .delete()
+            .eq('order_id', orderId);
+
+        // Delete main order record
+        const { error } = await supabaseClient
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
+
+        if (error) throw error;
+        return true;
+    } catch(err) {
+        console.error('deleteOrderFromSupabase error:', err);
+        return false;
+    }
 }
 
 // Subscriptions

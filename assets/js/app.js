@@ -292,6 +292,15 @@ async function checkout() {
     const orderCode = `#LC-${Math.floor(1000 + Math.random() * 9000)}`;
     const addrLine = `${activeAddr.street_address}${activeAddr.city ? ', ' + activeAddr.city : ''}${activeAddr.state ? ' - ' + activeAddr.state : ''}`;
 
+    // Read Pix settings
+    let pixConfig = { key: '', type: 'Chave Pix', holder: '' };
+    if (typeof fetchSettingsFromSupabase === 'function') {
+        const s = await fetchSettingsFromSupabase();
+        if (s['pix_config']) {
+            try { pixConfig = JSON.parse(s['pix_config']); } catch(e) {}
+        }
+    }
+
     let message = `*Novo Pedido - Lise Cozinha*\n*Código:* ${orderCode}\n\n`;
     cart.forEach(item => {
         const itemSubtotal = item.price * item.quantity;
@@ -305,7 +314,17 @@ async function checkout() {
     if (activeAddr.complement) {
         message += `\n*Complemento:* ${activeAddr.complement}`;
     }
-    message += `\n\n_Por favor, confirme meu pedido e informe o tempo de entrega!_`;
+
+    if (pixConfig && pixConfig.key) {
+        message += `\n\n💳 *DADOS PARA PAGAMENTO PIX:*\n`;
+        message += `• *Tipo:* ${pixConfig.type || 'Pix'}\n`;
+        message += `• *Chave Pix:* ${pixConfig.key}\n`;
+        if (pixConfig.holder) message += `• *Titular:* ${pixConfig.holder}\n`;
+        message += `• *Valor:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
+    }
+
+    message += `\n📌 *Status:* 💳 Aguardando Pagamento\n`;
+    message += `_Por favor, envie o comprovante de pagamento por esta conversa do WhatsApp para confirmarmos seu pedido!_`;
 
     // Save order to Supabase
     if (typeof createOrderInSupabase === 'function') {
@@ -328,7 +347,84 @@ async function checkout() {
     window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`, '_blank');
     clearCart();
     toggleCart();
-    showToast(`Pedido ${orderCode} enviado para o WhatsApp da loja!`, 'success');
+
+    // Show Pix Modal to user on screen if Pix key exists
+    if (pixConfig && pixConfig.key) {
+        showPixPaymentModal({
+            pixKey: pixConfig.key,
+            pixType: pixConfig.type,
+            pixHolder: pixConfig.holder,
+            totalAmount: finalTotal,
+            orderCode: orderCode
+        });
+    } else {
+        showToast(`Pedido ${orderCode} enviado para o WhatsApp! Aguardando pagamento.`, 'success');
+    }
+}
+
+/** Show interactive Pix payment modal on screen */
+function showPixPaymentModal({ pixKey, pixType, pixHolder, totalAmount, orderCode }) {
+    let modal = document.getElementById('pix-payment-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'pix-payment-modal';
+        modal.className = 'fixed inset-0 bg-black/60 z-[150] flex items-center justify-center p-4 backdrop-blur-sm';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="bg-surface rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-outline-variant/30 relative animate-fade-in text-center">
+            <button onclick="document.getElementById('pix-payment-modal').remove()" class="absolute top-4 right-4 text-on-surface-variant hover:bg-surface-container p-1 rounded-full">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3">
+                <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1">pix</span>
+            </div>
+
+            <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
+                💳 Aguardando Pagamento
+            </span>
+            <h3 class="font-headline-lg text-2xl font-bold text-primary mb-1">Pagamento via Pix</h3>
+            <p class="text-xs text-on-surface-variant mb-4">Pedido <b class="text-primary">${orderCode}</b> — Total: <b class="text-primary">R$ ${parseFloat(totalAmount).toFixed(2).replace('.', ',')}</b></p>
+
+            <div class="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 text-left mb-4 space-y-2">
+                <div>
+                    <span class="text-[10px] font-bold text-on-surface-variant uppercase block">Tipo de Chave</span>
+                    <span class="text-xs font-bold text-primary">${pixType || 'Chave Pix'}</span>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold text-on-surface-variant uppercase block">Chave Pix</span>
+                    <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-outline-variant/40 mt-1">
+                        <span class="text-xs font-mono font-bold text-primary break-all pr-2" id="modal-pix-key-val">${pixKey}</span>
+                        <button onclick="navigator.clipboard.writeText('${pixKey}'); showToast('Chave Pix copiada!', 'success')"
+                            class="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-primary-container transition-all active:scale-95 flex-shrink-0">
+                            <span class="material-symbols-outlined text-xs">content_copy</span> Copiar
+                        </button>
+                    </div>
+                </div>
+                ${pixHolder ? `
+                <div>
+                    <span class="text-[10px] font-bold text-on-surface-variant uppercase block">Titular / Banco</span>
+                    <span class="text-xs font-bold text-primary">${pixHolder}</span>
+                </div>
+                ` : ''}
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-3.5 text-xs text-left mb-5 flex items-start gap-2.5">
+                <span class="material-symbols-outlined text-emerald-700 text-lg flex-shrink-0 mt-0.5">info</span>
+                <div>
+                    <p class="font-bold">Próximo passo:</p>
+                    <p class="text-[11px] text-emerald-800">Envie o comprovante no WhatsApp da loja para confirmarmos e iniciarmos o preparo na cozinha!</p>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('pix-payment-modal').remove()"
+                class="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-sm hover:bg-primary-container transition-all shadow-md active:scale-95">
+                Entendi, já enviei o comprovante
+            </button>
+        </div>
+    `;
 }
 
 // Reorder functionality

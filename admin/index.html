@@ -603,6 +603,81 @@
                     </div>
                 </div>
 
+                <!-- Card 5: Chave Pix da Loja -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-emerald-700 text-lg" style="font-variation-settings:'FILL' 1">pix</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Chave Pix da Loja</h4>
+                            <p class="text-[11px] text-on-surface-variant">Dados para o cliente realizar o pagamento Pix ao finalizar</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Tipo de Chave Pix</label>
+                            <select id="cfg-pix-type" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary font-bold">
+                                <option value="CPF">CPF</option>
+                                <option value="CNPJ">CNPJ</option>
+                                <option value="E-mail">E-mail</option>
+                                <option value="Telefone">Telefone / Celular</option>
+                                <option value="Chave Aleatória">Chave Aleat&oacute;ria (EVP)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Chave Pix (Chave de Dep&oacute;sito)</label>
+                            <input type="text" id="cfg-pix-key" placeholder="Ex: 123.456.789-00 ou contato@lisecozinha.com.br"
+                                class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-mono font-bold focus:outline-none focus:border-primary text-primary" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-primary mb-1">Titular / Banco (Opcional)</label>
+                            <input type="text" id="cfg-pix-holder" placeholder="Ex: Lise Cozinha Fit Ltda - Banco Nubank"
+                                class="w-full px-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                        </div>
+                        <button id="btn-save-pix" onclick="savePixConfig()"
+                            class="w-full bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">save</span> Salvar Chave Pix
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 6: Senha de Exclusão de Pedidos -->
+                <div class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-red-700 text-lg">lock</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm">Senha de Exclus&atilde;o de Pedidos</h4>
+                            <p class="text-[11px] text-on-surface-variant">Prote&ccedil;&atilde;o para excluir pedidos cancelados (Padr&atilde;o: <b>2606</b>)</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-primary mb-1">Senha Atual (para confirmar)</label>
+                            <input type="password" id="cfg-pass-current" placeholder="Digite a senha atual (ex: 2606)"
+                                class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold focus:outline-none focus:border-primary" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-primary mb-1">Nova Senha</label>
+                                <input type="password" id="cfg-pass-new" placeholder="Nova senha"
+                                    class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold focus:outline-none focus:border-primary" />
+                            </div>
+                            <div>
+                                <label class="block font-bold text-primary mb-1">Confirmar Nova Senha</label>
+                                <input type="password" id="cfg-pass-confirm" placeholder="Repita a nova senha"
+                                    class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs font-bold focus:outline-none focus:border-primary" />
+                            </div>
+                        </div>
+                        <button id="btn-save-pass" onclick="saveDeletePasswordConfig()"
+                            class="w-full bg-red-700 text-white py-2.5 rounded-xl font-bold text-xs hover:scale-105 transition-all shadow flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">vpn_key</span> Alterar Senha de Exclus&atilde;o
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -994,10 +1069,20 @@
         const id = order.id;
         const amount = parseFloat(order.total_amount || 0);
         const isPaid = ['preparando', 'saiu_entrega', 'entregue', 'cooking', 'delivering', 'delivered'].includes(s);
-        const isFinal = ['entregue', 'cancelado', 'delivered', 'cancelled'].includes(s);
 
-        if (isFinal) {
-            return `<span class="text-[10px] text-on-surface-variant italic">Pedido finalizado</span>`;
+        if (s === 'cancelado' || s === 'cancelled') {
+            return `
+                <div class="inline-flex items-center gap-1.5">
+                    <span class="text-[10px] text-red-600 font-bold">Cancelado</span>
+                    <button onclick="handleDeleteCancelledOrder('${id}', '${order.code}')" class="px-2 py-1 bg-red-600 text-white rounded font-bold text-xs hover:bg-red-700 flex items-center gap-0.5 shadow-sm" title="Excluir Pedido">
+                        <span class="material-symbols-outlined text-xs">delete</span>Excluir
+                    </button>
+                </div>
+            `;
+        }
+
+        if (s === 'entregue' || s === 'delivered') {
+            return `<span class="text-[10px] text-emerald-700 font-bold">✅ Entregue</span>`;
         }
 
         let html = '<div class="inline-flex flex-wrap gap-1">';
@@ -1015,7 +1100,7 @@
         // Print button
         html += `<button onclick="printOrderReceipt('${id}')" title="Imprimir Comanda" class="px-2 py-1 bg-surface-container text-primary rounded font-bold text-xs hover:bg-surface-container-high flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">print</span>Imprimir</button>`;
 
-        // Cancel button (if not already final)
+        // Cancel button
         html += `<button onclick="cancelOrder('${id}', ${isPaid ? amount : 0})" class="px-2 py-1 bg-red-50 text-red-700 rounded font-bold text-xs hover:bg-red-100">Cancelar</button>`;
 
         html += '</div>';
@@ -1725,7 +1810,14 @@
     function setSaveBtnState(btnId, state) {
         const btn = document.getElementById(btnId);
         if (!btn) return;
-        const origMap = { 'btn-save-delivery': '<span class="material-symbols-outlined text-sm">save</span> Salvar Taxa de Entrega', 'btn-save-hours': '<span class="material-symbols-outlined text-sm">save</span> Salvar Horários', 'btn-save-receipt': '<span class="material-symbols-outlined text-sm">save</span> Salvar Config. de Comanda', 'btn-save-sound': '<span class="material-symbols-outlined text-sm">save</span> Salvar Preferências de Som' };
+        const origMap = {
+            'btn-save-delivery': '<span class="material-symbols-outlined text-sm">save</span> Salvar Taxa de Entrega',
+            'btn-save-hours': '<span class="material-symbols-outlined text-sm">save</span> Salvar Horários',
+            'btn-save-receipt': '<span class="material-symbols-outlined text-sm">save</span> Salvar Config. de Comanda',
+            'btn-save-sound': '<span class="material-symbols-outlined text-sm">save</span> Salvar Preferências de Som',
+            'btn-save-pix': '<span class="material-symbols-outlined text-sm">save</span> Salvar Chave Pix',
+            'btn-save-pass': '<span class="material-symbols-outlined text-sm">vpn_key</span> Alterar Senha de Exclusão'
+        };
         if (state === 'saving') {
             btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Salvando...';
             btn.disabled = true;
@@ -1844,6 +1936,89 @@
         setSaveBtnState('btn-save-sound', ok ? 'saved' : 'error');
     }
 
+    async function savePixConfig() {
+        setSaveBtnState('btn-save-pix', 'saving');
+        const type = document.getElementById('cfg-pix-type')?.value || 'Chave Pix';
+        const key = document.getElementById('cfg-pix-key')?.value?.trim() || '';
+        const holder = document.getElementById('cfg-pix-holder')?.value?.trim() || '';
+
+        const pixData = { type, key, holder };
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('pix_config', JSON.stringify(pixData))
+            : (localStorage.setItem('lise_pix_config', JSON.stringify(pixData)), true);
+
+        setSaveBtnState('btn-save-pix', ok ? 'saved' : 'error');
+    }
+
+    async function saveDeletePasswordConfig() {
+        const currentInput = document.getElementById('cfg-pass-current')?.value;
+        const newPass = document.getElementById('cfg-pass-new')?.value;
+        const confirmPass = document.getElementById('cfg-pass-confirm')?.value;
+
+        let settings = {};
+        if (typeof fetchSettingsFromSupabase === 'function') {
+            settings = await fetchSettingsFromSupabase() || {};
+        }
+        const currentSavedPass = settings['delete_order_password'] || '2606';
+
+        if (currentInput !== currentSavedPass) {
+            alert('Senha atual incorreta! Digite a senha correta (Padrão: 2606).');
+            return;
+        }
+
+        if (!newPass || newPass.trim().length < 2) {
+            alert('Digite uma nova senha válida.');
+            return;
+        }
+
+        if (newPass !== confirmPass) {
+            alert('A nova senha e a confirmação não coincidem.');
+            return;
+        }
+
+        setSaveBtnState('btn-save-pass', 'saving');
+        const ok = typeof saveSettingInSupabase === 'function'
+            ? await saveSettingInSupabase('delete_order_password', newPass.trim())
+            : (localStorage.setItem('lise_delete_order_password', newPass.trim()), true);
+
+        setSaveBtnState('btn-save-pass', ok ? 'saved' : 'error');
+        if (ok) {
+            document.getElementById('cfg-pass-current').value = '';
+            document.getElementById('cfg-pass-new').value = '';
+            document.getElementById('cfg-pass-confirm').value = '';
+            showToast('Senha de exclusão alterada com sucesso!', 'success');
+        }
+    }
+
+    /** Delete cancelled order permanently with password confirmation */
+    async function handleDeleteCancelledOrder(orderId, orderCode) {
+        let settings = {};
+        if (typeof fetchSettingsFromSupabase === 'function') {
+            settings = await fetchSettingsFromSupabase() || {};
+        }
+        const targetPass = settings['delete_order_password'] || '2606';
+
+        const inputPass = prompt(`Deseja excluir permanentemente o pedido ${orderCode}?\nDigite a senha de segurança (Padrão: 2606):`);
+        if (inputPass === null) return; // User cancelled prompt
+
+        if (inputPass.trim() !== targetPass) {
+            alert('Senha incorreta! A exclusão do pedido foi cancelada.');
+            return;
+        }
+
+        const ok = typeof deleteOrderFromSupabase === 'function'
+            ? await deleteOrderFromSupabase(orderId)
+            : true;
+
+        if (ok) {
+            adminOrders = adminOrders.filter(o => o.id !== orderId);
+            renderAdminOrders();
+            showToast(`Pedido ${orderCode} excluído permanentemente!`, 'success');
+        } else {
+            alert('Erro ao excluir pedido. Tente novamente.');
+        }
+    }
+
     async function initSettingsTab() {
         // Always render days first with defaults (doesn't need Supabase)
         initHoursDays({});
@@ -1899,6 +2074,19 @@
         if (s['sound_enabled'] !== undefined) {
             const se = document.getElementById('cfg-sound-enabled');
             if (se) se.checked = s['sound_enabled'] !== 'false';
+        }
+
+        // Pix config
+        if (s['pix_config']) {
+            try {
+                const px = JSON.parse(s['pix_config']);
+                const t = document.getElementById('cfg-pix-type');
+                const k = document.getElementById('cfg-pix-key');
+                const h = document.getElementById('cfg-pix-holder');
+                if (t) t.value = px.type || 'CPF';
+                if (k) k.value = px.key || '';
+                if (h) h.value = px.holder || '';
+            } catch(e) {}
         }
     }
 </script>
