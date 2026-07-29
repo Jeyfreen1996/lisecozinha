@@ -491,7 +491,7 @@
                             <label class="block text-xs font-bold text-primary mb-1">Valor da Taxa (R$)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant">R$</span>
-                                <input type="number" step="0.01" min="0" id="cfg-delivery-fee" placeholder="5.00"
+                                <input type="text" id="cfg-delivery-fee" placeholder="5.00"
                                     class="w-full pl-8 pr-3 py-2.5 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary font-bold" />
                             </div>
                         </div>
@@ -900,6 +900,10 @@
             'settings': 'Configurações da Loja'
         };
         document.getElementById('admin-tab-title').innerText = titles[tabId] || 'Painel de Gerenciamento';
+
+        if (tabId === 'settings') {
+            initSettingsTab();
+        }
     }
 
     async function loadAdminData() {
@@ -950,9 +954,13 @@
             if (input) input.value = whatsappRes.value;
         }
 
-        // Update Overview Metrics
-        const totalRevenue = adminOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
-        const activeCount = adminOrders.filter(o => ['pending', 'confirmed', 'cooking', 'delivering'].includes(o.status)).length;
+        // Update Overview Metrics: sum ONLY paid/confirmed orders for total revenue
+        const paidStatuses = ['preparando', 'saiu_entrega', 'entregue', 'confirmed', 'cooking', 'delivering', 'delivered'];
+        const totalRevenue = adminOrders
+            .filter(o => paidStatuses.includes(o.status))
+            .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+
+        const activeCount = adminOrders.filter(o => ['aguardando_pagamento', 'preparando', 'saiu_entrega', 'pending', 'confirmed', 'cooking', 'delivering'].includes(o.status)).length;
 
         document.getElementById('metric-revenue').innerText = `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`;
         document.getElementById('metric-active-orders').innerText = activeCount;
@@ -1082,7 +1090,15 @@
         }
 
         if (s === 'entregue' || s === 'delivered') {
-            return `<span class="text-[10px] text-emerald-700 font-bold">✅ Entregue</span>`;
+            return `
+                <div class="inline-flex items-center gap-1.5">
+                    <span class="text-[10px] text-emerald-700 font-bold">✅ Entregue</span>
+                    <button onclick="printOrderReceipt('${id}')" title="Imprimir Comanda" class="px-2 py-1 bg-surface-container text-primary rounded font-bold text-xs hover:bg-surface-container-high flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">print</span>Imprimir</button>
+                    <button onclick="handleDeleteCancelledOrder('${id}', '${order.code}')" class="px-2 py-1 bg-red-600 text-white rounded font-bold text-xs hover:bg-red-700 flex items-center gap-0.5 shadow-sm" title="Excluir Pedido">
+                        <span class="material-symbols-outlined text-xs">delete</span>Excluir
+                    </button>
+                </div>
+            `;
         }
 
         let html = '<div class="inline-flex flex-wrap gap-1">';
@@ -1844,8 +1860,9 @@
         setSaveBtnState('btn-save-delivery', 'saving');
         try {
             const type = document.getElementById('cfg-delivery-type')?.value || 'fixed';
-            const fee = document.getElementById('cfg-delivery-fee')?.value || '0';
-            const value = { type, fee: type === 'free' ? '0' : fee };
+            const rawFee = document.getElementById('cfg-delivery-fee')?.value || '0';
+            const cleanFee = rawFee.replace(',', '.').replace(/[^0-9.]/g, '') || '0';
+            const value = { type, fee: type === 'free' ? '0' : cleanFee };
 
             if (typeof saveSettingInSupabase === 'function') {
                 await saveSettingInSupabase('delivery_fee', JSON.stringify(value));
@@ -2066,8 +2083,9 @@
             : true;
 
         if (ok) {
-            adminOrders = adminOrders.filter(o => o.id !== orderId);
+            adminOrders = adminOrders.filter(o => o.id !== orderId && o.code !== orderCode);
             renderAdminOrders();
+            loadAdminData(); // Instantly update metrics (Vendas Totais, Pedidos Ativos)
             showToast(`Pedido ${orderCode} excluído permanentemente!`, 'success');
         } else {
             alert('Erro ao excluir pedido. Tente novamente.');
@@ -2075,43 +2093,56 @@
     }
 
     async function initSettingsTab() {
-        // Always render days first with defaults (doesn't need Supabase)
+        // Always render days first with defaults
         initHoursDays({});
 
-        // Then try to load saved settings
+        // Try to load saved settings from Supabase or localStorage
         let s = {};
         try {
             if (typeof fetchSettingsFromSupabase === 'function') {
                 s = await fetchSettingsFromSupabase() || {};
             }
         } catch(e) {
-            console.warn('initSettingsTab: could not load settings from Supabase, using localStorage', e);
+            console.warn('initSettingsTab: error loading settings', e);
+        }
+
+        const localStr = localStorage.getItem('lise_settings');
+        if (localStr) {
+            try {
+                const localS = JSON.parse(localStr);
+                s = { ...localS, ...s };
+            } catch(e) {}
         }
 
         // Delivery fee
         if (s['delivery_fee']) {
             try {
-                const df = JSON.parse(s['delivery_fee']);
+                const df = typeof s['delivery_fee'] === 'object' ? s['delivery_fee'] : JSON.parse(s['delivery_fee']);
                 const typeEl = document.getElementById('cfg-delivery-type');
                 const feeEl = document.getElementById('cfg-delivery-fee');
                 if (typeEl) typeEl.value = df.type || 'fixed';
-                if (feeEl) feeEl.value = df.fee || '';
+                if (feeEl) {
+                    const cleanFee = String(df.fee || '0').replace(',', '.');
+                    feeEl.value = parseFloat(cleanFee || '0').toFixed(2);
+                }
                 toggleDeliveryFeeField();
-            } catch(e) {}
+            } catch(e) {
+                console.warn('initSettingsTab delivery_fee parse notice:', e);
+            }
         }
 
-        // Business hours — reload with saved data if available
+        // Business hours
         if (s['business_hours']) {
             try {
-                const hoursData = JSON.parse(s['business_hours']);
-                initHoursDays(hoursData); // re-render with saved data
+                const hoursData = typeof s['business_hours'] === 'object' ? s['business_hours'] : JSON.parse(s['business_hours']);
+                initHoursDays(hoursData);
             } catch(e) {}
         }
 
         // Receipt config
         if (s['receipt_config']) {
             try {
-                const rc = JSON.parse(s['receipt_config']);
+                const rc = typeof s['receipt_config'] === 'object' ? s['receipt_config'] : JSON.parse(s['receipt_config']);
                 const n = document.getElementById('cfg-receipt-name');
                 const f = document.getElementById('cfg-receipt-footer');
                 const a = document.getElementById('cfg-receipt-address');
@@ -2128,18 +2159,18 @@
         // Sound
         if (s['sound_enabled'] !== undefined) {
             const se = document.getElementById('cfg-sound-enabled');
-            if (se) se.checked = s['sound_enabled'] !== 'false';
+            if (se) se.checked = String(s['sound_enabled']) !== 'false';
         }
 
         // Pix config
-        if (s['pix_config']) {
+        if (s['pix_config'] || s['pix_key']) {
             try {
-                const px = JSON.parse(s['pix_config']);
+                const px = s['pix_config'] ? (typeof s['pix_config'] === 'object' ? s['pix_config'] : JSON.parse(s['pix_config'])) : {};
                 const t = document.getElementById('cfg-pix-type');
                 const k = document.getElementById('cfg-pix-key');
                 const h = document.getElementById('cfg-pix-holder');
                 if (t) t.value = px.type || 'CPF';
-                if (k) k.value = px.key || '';
+                if (k) k.value = px.key || s['pix_key'] || '';
                 if (h) h.value = px.holder || '';
             } catch(e) {}
         }
