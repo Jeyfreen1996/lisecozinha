@@ -2590,18 +2590,18 @@
 <div class="center subtitle">RELATÓRIO FINANCEIRO E FECHAMENTO DE CAIXA</div>
 <div class="sep"></div>
 
-<div><b>Período do Relatório:</b> \${fStart} até \${fEnd}</div>
-<div><b>Data de Emissão:</b> \${now}</div>
+<div><b>Período do Relatório:</b> ${fStart} até ${fEnd}</div>
+<div><b>Data de Emissão:</b> ${now}</div>
 <div class="sep"></div>
 
 <div class="bold" style="margin-bottom:6px;">RESUMO EXECUTIVO DO CAIXA:</div>
-<div class="row"><span>Faturamento Total (Pago/Confirmado):</span><b>R$ \${revenue.toFixed(2).replace('.',',')}</b></div>
-<div class="row"><span>Total de Pedidos Concluídos:</span><b>\${paidOrders.length}</b></div>
-<div class="row"><span>Ticket Médio por Pedido:</span><b>R$ \${avgTicket.toFixed(2).replace('.',',')}</b></div>
-<div class="row"><span>Pedidos Cancelados no Período:</span><b>\${cancelledOrders.length}</b></div>
+<div class="row"><span>Faturamento Total (Pago/Confirmado):</span><b>R$ ${revenue.toFixed(2).replace('.',',')}</b></div>
+<div class="row"><span>Total de Pedidos Concluídos:</span><b>${paidOrders.length}</b></div>
+<div class="row"><span>Ticket Médio por Pedido:</span><b>R$ ${avgTicket.toFixed(2).replace('.',',')}</b></div>
+<div class="row"><span>Pedidos Cancelados no Período:</span><b>${cancelledOrders.length}</b></div>
 
 <div class="sep"></div>
-<div class="bold">RELAÇÃO DE PEDIDOS NO PERÍODO (\${_reportFilteredOrders.length}):</div>
+<div class="bold">RELAÇÃO DE PEDIDOS NO PERÍODO (${_reportFilteredOrders.length}):</div>
 
 <table>
   <thead>
