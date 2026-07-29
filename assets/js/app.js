@@ -90,8 +90,34 @@ function clearCart() {
     saveCart();
 }
 
+/** Robustly fetch active delivery fee setting from Supabase or localStorage */
+async function getActiveDeliveryFee() {
+    if (typeof fetchSettingsFromSupabase === 'function') {
+        const s = await fetchSettingsFromSupabase() || {};
+        if (s['delivery_fee']) {
+            try {
+                const df = typeof s['delivery_fee'] === 'object' ? s['delivery_fee'] : JSON.parse(s['delivery_fee']);
+                if (df.type === 'free') return 0;
+                return parseFloat(String(df.fee || '0').replace(',', '.')) || 0;
+            } catch(e) {}
+        }
+    }
+    const cached = localStorage.getItem('lise_settings');
+    if (cached) {
+        try {
+            const s = JSON.parse(cached);
+            if (s.delivery_fee) {
+                const df = typeof s.delivery_fee === 'object' ? s.delivery_fee : JSON.parse(s.delivery_fee);
+                if (df.type === 'free') return 0;
+                return parseFloat(String(df.fee || '0').replace(',', '.')) || 0;
+            }
+        } catch(e) {}
+    }
+    return 0;
+}
+
 // Render cart drawer items
-function renderCart() {
+async function renderCart() {
     const container = document.getElementById('cart-items');
     const totalEl = document.getElementById('cart-total');
     if (!container || !totalEl) return;
@@ -134,17 +160,14 @@ function renderCart() {
         `;
     }).join('');
 
-    let activeCouponHtml = '';
-    let finalTotal = total;
+    let subtotal = total;
+    let couponDiscount = 0;
     if (activeAppliedCoupon && activeAppliedCoupon.valid) {
-        finalTotal = Math.max(0, total - activeAppliedCoupon.discountAmount);
-        activeCouponHtml = `
-            <div class="flex justify-between items-center text-xs text-emerald-800 font-bold py-1">
-                <span>Desconto (${activeAppliedCoupon.code}):</span>
-                <span>-R$ ${activeAppliedCoupon.discountAmount.toFixed(2).replace('.', ',')}</span>
-            </div>
-        `;
+        couponDiscount = activeAppliedCoupon.discountAmount;
     }
+
+    const deliveryFee = await getActiveDeliveryFee();
+    const finalTotal = Math.max(0, subtotal - couponDiscount + deliveryFee);
 
     const couponBoxHtml = `
         <div class="mt-4 pt-3 border-t border-outline-variant/20">
@@ -160,21 +183,43 @@ function renderCart() {
         </div>
     `;
 
-    const deliveryDaysNotice = `
-        <div class="bg-surface-container rounded-xl p-3 text-xs mt-3 mb-2 border border-outline-variant/30 flex items-start gap-2.5">
-            <span class="material-symbols-outlined text-secondary text-base mt-0.5">local_shipping</span>
-            <div>
-                <strong class="text-primary block font-bold">Dias de Entrega por Região:</strong>
-                <p class="text-on-surface-variant text-[11px] mt-0.5 leading-tight">
-                    <strong>Segunda:</strong> Tubarão, Gravatal, São Martinho, Braço do Norte, São Ludgero<br/>
-                    <strong>Quarta:</strong> Tubarão, Gravatal, São Martinho, Braço do Norte<br/>
-                    <strong>Sexta:</strong> Tubarão, Gravatal
-                </p>
-            </div>
+    const deliveryDaySelectorHtml = `
+        <div class="bg-surface-container/70 rounded-2xl p-3.5 mt-3 border border-outline-variant/30 space-y-1.5">
+            <label class="block text-xs font-bold text-primary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-base">calendar_today</span>
+                <span>Selecione o Dia da Sua Entrega:</span>
+            </label>
+            <select id="cart-delivery-day" class="w-full px-3 py-2.5 rounded-xl bg-surface border border-outline-variant/40 text-xs font-bold text-primary focus:outline-none focus:border-primary shadow-sm cursor-pointer">
+                <option value="Segunda-feira (Tubarão, Gravatal, São Martinho, Braço do Norte, São Ludgero)">📅 Segunda-feira — Tubarão, Gravatal, S. Martinho, B. do Norte, S. Ludgero</option>
+                <option value="Quarta-feira (Tubarão, Gravatal, São Martinho, Braço do Norte)">📅 Quarta-feira — Tubarão, Gravatal, S. Martinho, B. do Norte</option>
+                <option value="Sexta-feira (Tubarão, Gravatal)">📅 Sexta-feira — Tubarão, Gravatal</option>
+            </select>
+            <p class="text-[10px] text-on-surface-variant italic">Selecione o dia disponível de acordo com a sua cidade/bairro.</p>
         </div>
     `;
 
-    container.innerHTML = itemsHTML + couponBoxHtml + activeCouponHtml + deliveryDaysNotice;
+    const priceBreakdownHtml = `
+        <div class="bg-surface-container/40 rounded-xl p-3 mt-3 mb-2 space-y-1.5 border border-outline-variant/20">
+            <div class="flex justify-between text-xs text-on-surface-variant">
+                <span>Subtotal dos itens:</span>
+                <span class="font-bold">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="flex justify-between text-xs text-on-surface-variant">
+                <span>Taxa de Entrega:</span>
+                <span class="font-bold ${deliveryFee === 0 ? 'text-emerald-700' : 'text-primary'}">
+                    ${deliveryFee === 0 ? '✨ Grátis' : `+R$ ${deliveryFee.toFixed(2).replace('.', ',')}`}
+                </span>
+            </div>
+            ${couponDiscount > 0 ? `
+            <div class="flex justify-between text-xs text-emerald-700 font-bold">
+                <span>Desconto (${activeAppliedCoupon.code}):</span>
+                <span>-R$ ${couponDiscount.toFixed(2).replace('.', ',')}</span>
+            </div>
+            ` : ''}
+        </div>
+    `;
+
+    container.innerHTML = itemsHTML + couponBoxHtml + deliveryDaySelectorHtml + priceBreakdownHtml;
     totalEl.innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
 }
 
@@ -281,13 +326,17 @@ async function checkout() {
         return;
     }
 
-    let total = 0;
-    cart.forEach(item => { total += item.price * item.quantity; });
+    let subtotal = 0;
+    cart.forEach(item => { subtotal += item.price * item.quantity; });
 
-    let finalTotal = total;
+    let couponDiscount = 0;
     if (activeAppliedCoupon && activeAppliedCoupon.valid) {
-        finalTotal = Math.max(0, total - activeAppliedCoupon.discountAmount);
+        couponDiscount = activeAppliedCoupon.discountAmount;
     }
+
+    const deliveryFee = await getActiveDeliveryFee();
+    const finalTotal = Math.max(0, subtotal - couponDiscount + deliveryFee);
+    const selectedDeliveryDay = document.getElementById('cart-delivery-day')?.value || 'Segunda-feira (Tubarão, Gravatal, São Martinho, Braço do Norte, São Ludgero)';
 
     const orderCode = `#LC-${Math.floor(1000 + Math.random() * 9000)}`;
     const addrLine = `${activeAddr.street_address}${activeAddr.city ? ', ' + activeAddr.city : ''}${activeAddr.state ? ' - ' + activeAddr.state : ''}`;
@@ -300,13 +349,16 @@ async function checkout() {
         const itemSubtotal = item.price * item.quantity;
         message += `• ${item.quantity}x ${item.name} - R$ ${itemSubtotal.toFixed(2).replace('.', ',')}\n`;
     });
-    if (activeAppliedCoupon && activeAppliedCoupon.valid) {
-        message += `\n🏷️ Cupom ${activeAppliedCoupon.code}: -R$ ${activeAppliedCoupon.discountAmount.toFixed(2).replace('.', ',')}\n`;
+    message += `\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+    message += `*Taxa de Entrega:* ${deliveryFee === 0 ? '✨ Grátis' : `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`}\n`;
+    if (couponDiscount > 0) {
+        message += `🏷️ *Cupom ${activeAppliedCoupon.code}:* -R$ ${couponDiscount.toFixed(2).replace('.', ',')}\n`;
     }
-    message += `\n*Total: R$ ${finalTotal.toFixed(2).replace('.', ',')}*`;
-    message += `\n*Entrega:* ${addrLine}`;
+    message += `*Total Final: R$ ${finalTotal.toFixed(2).replace('.', ',')}*\n\n`;
+    message += `📅 *Dia de Entrega:* ${selectedDeliveryDay}\n`;
+    message += `📍 *Entrega:* ${addrLine}\n`;
     if (activeAddr.complement) {
-        message += `\n*Complemento:* ${activeAddr.complement}`;
+        message += `🏢 *Complemento:* ${activeAddr.complement}\n`;
     }
 
     if (pixConfig && pixConfig.key) {
@@ -323,12 +375,13 @@ async function checkout() {
     // Save order to Supabase
     if (typeof createOrderInSupabase === 'function') {
         const profile = typeof fetchProfileFromSupabase === 'function' ? await fetchProfileFromSupabase() : null;
+        const fullComplement = [activeAddr.complement, `[Dia de Entrega: ${selectedDeliveryDay}]`].filter(Boolean).join(' ');
         await createOrderInSupabase({
             code: orderCode,
             customer_name: profile ? profile.name : 'Cliente Lise',
             customer_phone: profile ? profile.phone : 'Não informado',
             delivery_address: addrLine,
-            address_complement: activeAddr.complement || '',
+            address_complement: fullComplement,
             total_amount: finalTotal
         }, cart);
         localStorage.setItem('last_order_code', orderCode);
