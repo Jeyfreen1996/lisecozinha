@@ -18,7 +18,48 @@ document.addEventListener('DOMContentLoaded', () => {
     injectCartDrawerHTML();
     injectToastContainerHTML();
     renderCart();
+    checkStoreStatus();
 });
+
+// Dynamic Store Open/Closed Badge Status
+async function checkStoreStatus() {
+    const badge = document.getElementById('store-status-badge');
+    if (!badge) return;
+
+    let settings = {};
+    if (typeof fetchSettingsFromSupabase === 'function') {
+        settings = await fetchSettingsFromSupabase() || {};
+    } else {
+        const cached = localStorage.getItem('lise_settings');
+        if (cached) try { settings = JSON.parse(cached); } catch(e) {}
+    }
+
+    if (!settings['business_hours']) return;
+    
+    try {
+        const hours = typeof settings['business_hours'] === 'object' 
+            ? settings['business_hours'] 
+            : JSON.parse(settings['business_hours']);
+
+        const now = new Date();
+        const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+        const todayKey = days[now.getDay()];
+        const todayConfig = hours[todayKey];
+
+        const currentTimeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+        badge.classList.remove('hidden');
+        if (todayConfig && todayConfig.open && currentTimeStr >= todayConfig.from && currentTimeStr <= todayConfig.to) {
+            badge.innerText = 'Loja Aberta';
+            badge.className = 'text-[9px] px-2 py-0.5 rounded-full font-bold uppercase mt-0.5 inline-block bg-emerald-100 text-emerald-800 border border-emerald-300';
+        } else {
+            badge.innerText = 'Loja Fechada';
+            badge.className = 'text-[9px] px-2 py-0.5 rounded-full font-bold uppercase mt-0.5 inline-block bg-red-100 text-red-800 border border-red-300';
+        }
+    } catch(e) {
+        console.warn('Error checking store status', e);
+    }
+}
 
 // Save cart state
 function saveCart() {
