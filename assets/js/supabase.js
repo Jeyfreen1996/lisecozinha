@@ -998,6 +998,7 @@ async function addAddressToSupabase(addressData) {
             profile_id: currentUser ? currentUser.id : null,
             label: addressData.label || 'Meu Endereço',
             street_address: addressData.street_address,
+            complement: addressData.complement || '',
             city: addressData.city || '',
             state: addressData.state || '',
             is_default: addressData.is_default || false
@@ -1212,6 +1213,51 @@ function subscribeToProductsRealtime(callback) {
             if (callback) callback(payload);
         })
         .subscribe();
+}
+
+function subscribeToAddressesRealtime(callback) {
+    if (!supabaseClient) return null;
+    return supabaseClient
+        .channel('public:addresses')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'addresses' }, payload => {
+            if (callback) callback(payload);
+        })
+        .subscribe();
+}
+
+function subscribeToSettingsRealtime(callback) {
+    if (!supabaseClient) return null;
+    return supabaseClient
+        .channel('public:settings')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, payload => {
+            if (callback) callback(payload);
+        })
+        .subscribe();
+}
+
+function subscribeToProfilesRealtime(callback) {
+    if (!supabaseClient) return null;
+    return supabaseClient
+        .channel('public:profiles')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, payload => {
+            if (callback) callback(payload);
+        })
+        .subscribe();
+}
+
+async function deleteAddressFromSupabase(addressId) {
+    if (!supabaseClient) return true;
+    try {
+        const { error } = await supabaseClient
+            .from('addresses')
+            .delete()
+            .eq('id', addressId);
+        if (error) throw error;
+        return true;
+    } catch (err) {
+        console.error('deleteAddressFromSupabase error:', err);
+        return false;
+    }
 }
 
 // Inject Auth Modal for Seamless Registration & Login

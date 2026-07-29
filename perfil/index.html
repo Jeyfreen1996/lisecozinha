@@ -433,18 +433,24 @@
         if (listEl) {
             if (addresses && addresses.length > 0) {
                 listEl.innerHTML = addresses.map(addr => `
-                    <div class="p-4 ${addr.is_default ? 'bg-surface-container border border-outline-variant/20' : 'border border-outline-variant/30 opacity-80'} rounded-xl flex justify-between items-start">
-                        <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings:'FILL' 1">${addr.label && addr.label.toLowerCase().includes('trabalho') ? 'work' : 'home'}</span>
-                            <div>
+                    <div class="p-4 ${addr.is_default ? 'bg-surface-container border border-outline-variant/20' : 'border border-outline-variant/30 opacity-80'} rounded-xl flex justify-between items-start gap-2">
+                        <div class="flex gap-3 min-w-0 flex-1">
+                            <span class="material-symbols-outlined text-primary mt-0.5 flex-shrink-0" style="font-variation-settings:'FILL' 1">${addr.label && addr.label.toLowerCase().includes('trabalho') ? 'work' : 'home'}</span>
+                            <div class="min-w-0">
                                 <div class="flex items-center gap-2">
-                                    <p class="font-bold text-primary text-sm">${addr.label}</p>
-                                    ${addr.is_default ? '<span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">Padrão</span>' : ''}
+                                    <p class="font-bold text-primary text-sm">${addr.label || 'Endereço'}</p>
+                                    ${addr.is_default ? '<span class="bg-primary-container text-on-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0">Padrão</span>' : ''}
                                 </div>
-                                <p class="text-xs text-on-surface-variant mt-1">${addr.street_address}${addr.city ? '<br/>' + addr.city + (addr.state ? ' - ' + addr.state : '') : ''}</p>
+                                <p class="text-xs text-on-surface-variant mt-1 break-words">${addr.street_address}</p>
+                                ${addr.complement ? `<p class="text-[11px] font-bold text-primary break-words mt-0.5">${addr.complement}</p>` : ''}
+                                ${addr.city ? `<p class="text-[11px] text-on-surface-variant">${addr.city}${addr.state ? ' - ' + addr.state : ''}</p>` : ''}
                             </div>
                         </div>
-                        <span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer text-sm">edit</span>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button onclick="deleteAddress('${addr.id}')" class="text-on-surface-variant hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Excluir Endereço">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             } else {
@@ -702,6 +708,17 @@
         showToast('Preferências salvas!');
     }
 
+    async function deleteAddress(addressId) {
+        if (!confirm("Deseja realmente remover este endereço?")) return;
+        if (typeof deleteAddressFromSupabase === 'function') {
+            const ok = await deleteAddressFromSupabase(addressId);
+            if (ok) {
+                showToast('Endereço removido!');
+                loadProfileFromSupabase();
+            }
+        }
+    }
+
     function confirmLogout() {
         if (confirm("Deseja realmente sair da sua conta?")) {
             logoutUserFromSupabase();
@@ -710,6 +727,18 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         loadProfileFromSupabase();
+
+        // Realtime sync for addresses & profiles
+        if (typeof subscribeToAddressesRealtime === 'function') {
+            subscribeToAddressesRealtime(() => {
+                loadProfileFromSupabase();
+            });
+        }
+        if (typeof subscribeToProfilesRealtime === 'function') {
+            subscribeToProfilesRealtime(() => {
+                loadProfileFromSupabase();
+            });
+        }
     });
 </script>
 </body>
