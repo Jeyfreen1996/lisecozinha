@@ -1115,24 +1115,27 @@ async function fetchSettingsFromSupabase() {
 async function saveSettingInSupabase(key, value) {
     const strValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
 
-    // Update localStorage cache
+    // Always save to localStorage first (primary store)
     const cached = localStorage.getItem('lise_settings');
     let settings = {};
     if (cached) try { settings = JSON.parse(cached); } catch(e) {}
     settings[key] = strValue;
     localStorage.setItem('lise_settings', JSON.stringify(settings));
 
-    if (!supabaseClient) return true;
+    // Try Supabase (optional - table may not exist yet)
+    if (!supabaseClient) return true; // localStorage is enough
     try {
         const { error } = await supabaseClient
             .from('settings')
             .upsert({ key, value: strValue, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-        if (error) throw error;
-        return true;
+        if (error) {
+            // Table might not exist yet - that's OK, localStorage is the fallback
+            console.warn('settings table not available, using localStorage only:', error.message);
+        }
     } catch(err) {
-        console.error('saveSettingInSupabase error:', err);
-        return false;
+        console.warn('saveSettingInSupabase Supabase error (localStorage OK):', err);
     }
+    return true; // Always success if localStorage worked
 }
 
 /**
