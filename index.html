@@ -45,6 +45,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
+        @keyframes pwa-bounce {
+            0%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+            60% { transform: translateY(-3px); }
+        }
+        .animate-bounce-pwa { animation: pwa-bounce 1.8s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
         /* Anti-FOUT: Hide raw ligature text before font loads */
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -235,6 +242,11 @@
                         Ver Meus Pedidos
                     </a>
                 </div>
+                <!-- PWA Hero Install Button (shown only if not installed) -->
+                <button id="pwa-hero-install-btn" class="hidden mt-5 bg-white text-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg active:scale-95 transition-all border-2 border-white/40" style="backdrop-filter: blur(10px);">
+                    <span class="material-symbols-outlined text-base">install_mobile</span>
+                    Instalar App Grátis
+                </button>
             </div>
         </div>
     </section>
@@ -389,7 +401,7 @@
     </section>
 </main>
 
-<!-- PWA Install Banner -->
+<!-- PWA Install Banner (floating, bottom) -->
 <div id="pwa-install-banner" class="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:w-80 bg-surface-container shadow-2xl rounded-2xl p-4 border border-outline-variant/30 z-50 flex flex-col gap-3 translate-y-[150%] transition-transform duration-500 ease-out">
     <div class="flex items-start justify-between gap-3">
         <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
@@ -399,13 +411,43 @@
             <h4 class="font-bold text-primary text-sm">Instale nosso App!</h4>
             <p class="text-xs text-on-surface-variant leading-tight mt-0.5">Faça seus pedidos mais rápido direto da tela inicial do seu celular.</p>
         </div>
-        <button onclick="dismissPwaBanner()" class="text-on-surface-variant hover:bg-surface-container-high p-1 rounded-full transition-colors active:scale-95 shrink-0">
+        <button id="pwa-dismiss-btn" class="text-on-surface-variant hover:bg-surface-container-high p-1 rounded-full transition-colors active:scale-95 shrink-0">
             <span class="material-symbols-outlined text-sm">close</span>
         </button>
     </div>
-    <button id="pwa-install-btn" class="w-full bg-primary text-white py-2.5 rounded-xl font-bold text-xs hover:bg-primary-container transition-all shadow-md active:scale-95">
+    <button id="pwa-install-btn" class="w-full bg-primary text-white py-2.5 rounded-xl font-bold text-xs hover:bg-primary-container transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-sm">download</span>
         Instalar Aplicativo
     </button>
+</div>
+
+<!-- iOS Install Instructions Modal -->
+<div id="pwa-ios-modal" class="hidden fixed inset-0 bg-black/60 z-[200] flex items-end justify-center backdrop-blur-sm">
+    <div class="bg-surface w-full max-w-sm rounded-t-3xl p-6 pb-10 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-primary text-lg">Instalar no iPhone / iPad</h3>
+            <button id="pwa-ios-modal-close" class="p-2 text-on-surface-variant rounded-full hover:bg-surface-container">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <ol class="space-y-4">
+            <li class="flex items-start gap-3">
+                <span class="w-7 h-7 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
+                <p class="text-sm text-on-surface-variant">Toque no botão <strong class="text-primary">compartilhar</strong> (quadrado com seta pra cima) na barra inferior do Safari.</p>
+            </li>
+            <li class="flex items-start gap-3">
+                <span class="w-7 h-7 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
+                <p class="text-sm text-on-surface-variant">Role a lista e toque em <strong class="text-primary">"Adicionar à Tela de Início"</strong>.</p>
+            </li>
+            <li class="flex items-start gap-3">
+                <span class="w-7 h-7 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
+                <p class="text-sm text-on-surface-variant">Toque em <strong class="text-primary">"Adicionar"</strong> no canto superior direito. Pronto!</p>
+            </li>
+        </ol>
+        <button id="pwa-ios-modal-close" onclick="document.getElementById('pwa-ios-modal').classList.add('hidden')" class="mt-6 w-full bg-primary text-white py-3 rounded-xl font-bold text-sm active:scale-95 transition-all">
+            Entendi!
+        </button>
+    </div>
 </div>
 
 <!-- Bottom Navigation Bar -->

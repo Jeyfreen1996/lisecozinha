@@ -1,15 +1,25 @@
-const CACHE_NAME = 'lise-cozinha-v1';
+const CACHE_NAME = 'lise-cozinha-v3';
 const ASSETS = [
     '/',
     '/index.html',
+    '/cardapio/index.html',
+    '/pedidos/index.html',
+    '/avaliacoes/index.html',
+    '/perfil/index.html',
     '/assets/js/app.js',
-    '/assets/js/supabase.js'
+    '/assets/js/supabase.js',
+    '/manifest.json',
+    '/assets/img/icon-192.png',
+    '/assets/img/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS))
+            .then(cache => {
+                // Cache each asset individually, ignoring failures
+                return Promise.allSettled(ASSETS.map(url => cache.add(url)));
+            })
             .then(() => self.skipWaiting())
     );
 });
@@ -27,11 +37,18 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
+    // Don't cache Supabase, CDN fonts, or external resources
     if (event.request.url.includes('supabase.co')) return;
+    if (event.request.url.includes('fonts.googleapis.com')) return;
+    if (event.request.url.includes('fonts.gstatic.com')) return;
+    if (event.request.url.includes('cdn.tailwindcss.com')) return;
+    if (event.request.url.includes('cdn.jsdelivr.net')) return;
+    if (event.request.url.includes('mapbox.com')) return;
 
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
+                // Return cached version immediately, fetch update in background
                 if (cachedResponse) {
                     fetch(event.request).then(response => {
                         if (response && response.status === 200) {
@@ -42,6 +59,7 @@ self.addEventListener('fetch', (event) => {
                     }).catch(() => {});
                     return cachedResponse;
                 }
+                // Not in cache, fetch from network
                 return fetch(event.request).then(response => {
                     if (response && response.status === 200 && response.type === 'basic') {
                         const responseToCache = response.clone();
@@ -52,7 +70,8 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 });
             }).catch(() => {
-                if (event.request.headers.get('accept').includes('text/html')) {
+                // Offline fallback
+                if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
                     return caches.match('/index.html');
                 }
             })

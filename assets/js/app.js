@@ -27,65 +27,120 @@ document.addEventListener('DOMContentLoaded', () => {
 // Register Service Worker for PWA
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(err => {
-                console.warn('SW registration failed:', err);
-            });
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('SW registered:', reg.scope);
+        }).catch(err => {
+            console.warn('SW registration failed:', err);
         });
     }
 }
 
-// PWA Installation Logic
-let deferredPrompt;
+// ─────────────────────────────────────────
+// PWA Install Logic (Android + iOS + Desktop)
+// ─────────────────────────────────────────
+let deferredPrompt = null;
+const PWA_DISMISSED_KEY = 'lise_pwa_dismissed';
+
+function isPwaInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+}
+
+function isIos() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+
+function showPwaBanner() {
+    if (isPwaInstalled()) return; // Already installed
+    if (sessionStorage.getItem(PWA_DISMISSED_KEY)) return; // User dismissed this session
+
+    const banner = document.getElementById('pwa-install-banner');
+    const heroBtn = document.getElementById('pwa-hero-install-btn');
+    if (banner) banner.classList.remove('translate-y-[150%]');
+    if (heroBtn) {
+        heroBtn.classList.remove('hidden');
+        heroBtn.classList.add('animate-bounce-pwa');
+    }
+}
+
+function dismissPwaBanner() {
+    sessionStorage.setItem(PWA_DISMISSED_KEY, '1');
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.add('translate-y-[150%]');
+    const heroBtn = document.getElementById('pwa-hero-install-btn');
+    if (heroBtn) heroBtn.classList.add('hidden');
+}
+
+async function triggerPwaInstall() {
+    if (deferredPrompt) {
+        // Android / Desktop Chrome
+        const installBtn = document.getElementById('pwa-install-btn');
+        const heroBtn = document.getElementById('pwa-hero-install-btn');
+        try {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                if (installBtn) { installBtn.innerHTML = '<span class="material-symbols-outlined text-sm" style="animation: spin 1s linear infinite;">progress_activity</span> Instalando...';
+                    installBtn.disabled = true; }
+                if (heroBtn) { heroBtn.innerHTML = '<span class="material-symbols-outlined text-sm" style="animation: spin 1s linear infinite;">progress_activity</span> Instalando...';
+                    heroBtn.disabled = true; }
+                showToast('Instalando Lise Cozinha no seu dispositivo...', 'info');
+            } else {
+                dismissPwaBanner();
+            }
+        } catch (err) {
+            console.error('Install failed:', err);
+        }
+        deferredPrompt = null;
+    } else if (isIos()) {
+        // iOS Safari - show manual instruction modal
+        const modal = document.getElementById('pwa-ios-modal');
+        if (modal) modal.classList.remove('hidden');
+    } else {
+        // Fallback: Inform user to use browser menu
+        showToast('Abra o menu do navegador e toque em "Instalar aplicativo" ou "Adicionar à tela inicial".', 'info');
+    }
+}
+
+// Capture install prompt (Android/Desktop)
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // Show banner after a slight delay for better UX
-    setTimeout(() => {
-        const banner = document.getElementById('pwa-install-banner');
-        if (banner) banner.classList.remove('translate-y-[150%]');
-    }, 100);
+    setTimeout(showPwaBanner, 100);
 });
 
-function dismissPwaBanner() {
-    const banner = document.getElementById('pwa-install-banner');
-    if (banner) banner.classList.add('translate-y-[150%]');
-}
+// App successfully installed
+window.addEventListener('appinstalled', () => {
+    showToast('✅ Lise Cozinha instalada com sucesso! Acesse pela tela inicial.', 'success');
+    dismissPwaBanner();
+    deferredPrompt = null;
+});
 
+// Hook up buttons after DOM loads
 document.addEventListener('DOMContentLoaded', () => {
-    const installBtn = document.getElementById('pwa-install-btn');
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                try {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log('PWA Installation outcome:', outcome);
-                    if (outcome === 'accepted') {
-                        installBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Instalando... aguarde';
-                        installBtn.disabled = true;
-                        installBtn.classList.add('opacity-80');
-                        showToast('Instalando aplicativo, por favor aguarde um momento...', 'info');
-                    } else {
-                        dismissPwaBanner();
-                    }
-                } catch (err) {
-                    console.error('Failed to install PWA:', err);
-                    dismissPwaBanner();
-                }
-                deferredPrompt = null;
-            } else {
-                console.warn('deferredPrompt is null');
-            }
-        });
+    // If already in standalone, never show banners
+    if (isPwaInstalled()) return;
+
+    // Hook install buttons
+    ['pwa-install-btn', 'pwa-hero-install-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', triggerPwaInstall);
+    });
+    const dismissBtn = document.getElementById('pwa-dismiss-btn');
+    if (dismissBtn) dismissBtn.addEventListener('click', dismissPwaBanner);
+    const iosClose = document.getElementById('pwa-ios-modal-close');
+    if (iosClose) iosClose.addEventListener('click', () => {
+        const modal = document.getElementById('pwa-ios-modal');
+        if (modal) modal.classList.add('hidden');
+        dismissPwaBanner();
+    });
+
+    // iOS: show banner automatically since no beforeinstallprompt fires
+    if (isIos() && !sessionStorage.getItem(PWA_DISMISSED_KEY)) {
+        setTimeout(showPwaBanner, 800);
     }
 });
 
-// Listen for successful installation
-window.addEventListener('appinstalled', () => {
-    showToast('¡Lise Cozinha foi instalada com sucesso no seu dispositivo!', 'success');
-    dismissPwaBanner();
-});
 
 // Dynamic Store Open/Closed Badge Status
 async function checkStoreStatus() {
