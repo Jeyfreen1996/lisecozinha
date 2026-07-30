@@ -21,7 +21,19 @@ document.addEventListener('DOMContentLoaded', () => {
     checkStoreStatus();
     updateActiveOrdersBadge();
     loadHomepageConfig();
+    registerServiceWorker();
 });
+
+// Register Service Worker for PWA
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.warn('SW registration failed:', err);
+            });
+        });
+    }
+}
 
 // Dynamic Store Open/Closed Badge Status
 async function checkStoreStatus() {
@@ -134,12 +146,52 @@ async function loadHomepageConfig() {
             const tag = document.getElementById('hero-tag');
             const title = document.getElementById('hero-title');
             const desc = document.getElementById('hero-desc');
+            const defaultLogo = document.getElementById('default-logo-icon');
+            const dynamicLogo = document.getElementById('dynamic-logo-img');
+            const manifestLink = document.getElementById('pwa-manifest');
+            const appleIcon = document.getElementById('pwa-apple-icon');
             
             if (img1 && hc.img1) img1.style.backgroundImage = `url('${hc.img1}')`;
             if (img2 && hc.img2) img2.style.backgroundImage = `url('${hc.img2}')`;
             if (tag && hc.tag) tag.innerText = hc.tag;
             if (title && hc.title) title.innerText = hc.title;
             if (desc && hc.desc) desc.innerText = hc.desc;
+
+            if (hc.logo && hc.logo.length > 5) {
+                if (defaultLogo) defaultLogo.classList.add('hidden');
+                if (dynamicLogo) {
+                    dynamicLogo.src = hc.logo;
+                    dynamicLogo.classList.remove('hidden');
+                }
+            }
+
+            // Generate Dynamic PWA Manifest
+            if (manifestLink) {
+                const pwaIconSrc = (hc.pwaIcon && hc.pwaIcon.length > 5) ? hc.pwaIcon : '/assets/img/icon-512.png';
+                if (appleIcon) appleIcon.href = pwaIconSrc;
+
+                const manifestObj = {
+                    "name": hc.title || "Lise Cozinha",
+                    "short_name": hc.title ? hc.title.substring(0, 12) : "Lise",
+                    "description": hc.desc || "Gastronomia Saudável",
+                    "start_url": "/",
+                    "display": "standalone",
+                    "background_color": "#012d1d",
+                    "theme_color": "#012d1d",
+                    "icons": [
+                        {
+                            "src": pwaIconSrc,
+                            "sizes": "192x192 512x512",
+                            "type": "image/png"
+                        }
+                    ]
+                };
+
+                const stringManifest = JSON.stringify(manifestObj);
+                const blob = new Blob([stringManifest], {type: 'application/json'});
+                const manifestURL = URL.createObjectURL(blob);
+                manifestLink.setAttribute('href', manifestURL);
+            }
         }
     } catch(e) {
         console.warn('Error loading homepage config:', e);

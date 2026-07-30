@@ -695,29 +695,80 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <!-- Imagens -->
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block font-bold text-primary mb-1">Imagem do Slider 1 (URL)</label>
-                                <input type="text" id="cfg-hero-img-1" placeholder="Link da primeira imagem" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                        <div class="space-y-4">
+                            <!-- Logo Principal -->
+                            <div class="bg-surface-container rounded-xl p-3 border border-outline-variant/20">
+                                <label class="block font-bold text-primary mb-1 text-[11px] uppercase tracking-wider">Logo da Loja</label>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <label class="cursor-pointer bg-white hover:bg-surface-container-high text-primary font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-outline-variant/30 transition-all active:scale-95">
+                                        <span class="material-symbols-outlined text-sm">upload_file</span> Subir Arquivo
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleAdminFileUpload(event, 'cfg-hero-logo')">
+                                    </label>
+                                </div>
+                                <input type="text" id="cfg-hero-logo" placeholder="URL ou Base64" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
                             </div>
-                            <div>
-                                <label class="block font-bold text-primary mb-1">Imagem do Slider 2 (URL)</label>
-                                <input type="text" id="cfg-hero-img-2" placeholder="Link da segunda imagem" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+
+                            <!-- Sliders -->
+                            <div class="bg-surface-container rounded-xl p-3 border border-outline-variant/20">
+                                <label class="block font-bold text-primary mb-1 text-[11px] uppercase tracking-wider">Imagens do Slider (Banner)</label>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-xs font-bold text-on-surface">Slider 1</span>
+                                            <label class="cursor-pointer text-secondary font-bold text-[10px] flex items-center gap-1 hover:underline">
+                                                <span class="material-symbols-outlined text-[11px]">upload</span> Subir Arquivo
+                                                <input type="file" accept="image/*" class="hidden" onchange="handleAdminFileUpload(event, 'cfg-hero-img-1')">
+                                            </label>
+                                        </div>
+                                        <input type="text" id="cfg-hero-img-1" placeholder="URL ou Base64" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-xs font-bold text-on-surface">Slider 2</span>
+                                            <label class="cursor-pointer text-secondary font-bold text-[10px] flex items-center gap-1 hover:underline">
+                                                <span class="material-symbols-outlined text-[11px]">upload</span> Subir Arquivo
+                                                <input type="file" accept="image/*" class="hidden" onchange="handleAdminFileUpload(event, 'cfg-hero-img-2')">
+                                            </label>
+                                        </div>
+                                        <input type="text" id="cfg-hero-img-2" placeholder="URL ou Base64" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <!-- Textos -->
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block font-bold text-primary mb-1">Tag/Etiqueta Superior</label>
-                                <input type="text" id="cfg-hero-tag" placeholder="Ex: Alimentação Saudável" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+
+                        <!-- Textos e PWA -->
+                        <div class="space-y-4">
+                            <!-- Textos do Banner -->
+                            <div class="bg-surface-container rounded-xl p-3 border border-outline-variant/20 space-y-3">
+                                <label class="block font-bold text-primary mb-1 text-[11px] uppercase tracking-wider">Textos do Banner</label>
+                                <div>
+                                    <label class="block font-bold text-on-surface mb-1 text-[10px]">Tag/Etiqueta Superior</label>
+                                    <input type="text" id="cfg-hero-tag" placeholder="Ex: Alimentação Saudável" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-on-surface mb-1 text-[10px]">T&iacute;tulo Principal</label>
+                                    <input type="text" id="cfg-hero-title" placeholder="Título em destaque" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-on-surface mb-1 text-[10px]">Descri&ccedil;&atilde;o Secund&aacute;ria</label>
+                                    <textarea id="cfg-hero-desc" placeholder="Texto que aparece abaixo do título" rows="2" class="w-full px-3 py-2 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary resize-none"></textarea>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block font-bold text-primary mb-1">T&iacute;tulo Principal</label>
-                                <input type="text" id="cfg-hero-title" placeholder="Título em destaque" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-primary mb-1">Descri&ccedil;&atilde;o Secund&aacute;ria</label>
-                                <textarea id="cfg-hero-desc" placeholder="Texto que aparece abaixo do título" rows="2" class="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline-variant/30 text-xs focus:outline-none focus:border-primary resize-none"></textarea>
+                            
+                            <!-- Configuração PWA -->
+                            <div class="bg-surface-container rounded-xl p-3 border border-outline-variant/20 space-y-3">
+                                <label class="block font-bold text-primary mb-1 text-[11px] uppercase tracking-wider">App Mobile (PWA)</label>
+                                
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-[10px] font-bold text-on-surface">Ícone do App (512x512)</span>
+                                        <label class="cursor-pointer text-secondary font-bold text-[10px] flex items-center gap-1 hover:underline">
+                                            <span class="material-symbols-outlined text-[11px]">upload</span> Subir
+                                            <input type="file" accept="image/png, image/jpeg" class="hidden" onchange="handleAdminFileUpload(event, 'cfg-pwa-icon')">
+                                        </label>
+                                    </div>
+                                    <input type="text" id="cfg-pwa-icon" placeholder="Base64 PNG" class="w-full px-3 py-1.5 rounded-xl bg-white border border-outline-variant/30 text-xs focus:outline-none focus:border-primary" />
+                                </div>
                             </div>
                         </div>
                         
@@ -1794,6 +1845,20 @@
         setTimeout(() => modal.classList.add('hidden'), 300);
     }
 
+    function handleAdminFileUpload(event, targetId) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Data = e.target.result;
+            const targetInput = document.getElementById(targetId);
+            if (targetInput) targetInput.value = base64Data;
+            showToast('Arquivo carregado com sucesso!', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
     function handleDeviceFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -2275,8 +2340,10 @@
             const tag = document.getElementById('cfg-hero-tag')?.value?.trim() || '';
             const title = document.getElementById('cfg-hero-title')?.value?.trim() || '';
             const desc = document.getElementById('cfg-hero-desc')?.value?.trim() || '';
+            const logo = document.getElementById('cfg-hero-logo')?.value?.trim() || '';
+            const pwaIcon = document.getElementById('cfg-pwa-icon')?.value?.trim() || '';
             
-            const homepageConfig = { img1, img2, tag, title, desc };
+            const homepageConfig = { img1, img2, tag, title, desc, logo, pwaIcon };
 
             if (typeof saveSettingInSupabase === 'function') {
                 await saveSettingInSupabase('homepage_config', JSON.stringify(homepageConfig));
@@ -2497,12 +2564,16 @@
                 const tag = document.getElementById('cfg-hero-tag');
                 const title = document.getElementById('cfg-hero-title');
                 const desc = document.getElementById('cfg-hero-desc');
+                const logo = document.getElementById('cfg-hero-logo');
+                const pwaIcon = document.getElementById('cfg-pwa-icon');
                 
                 if (img1) img1.value = hc.img1 || '';
                 if (img2) img2.value = hc.img2 || '';
                 if (tag) tag.value = hc.tag || '';
                 if (title) title.value = hc.title || '';
                 if (desc) desc.value = hc.desc || '';
+                if (logo) logo.value = hc.logo || '';
+                if (pwaIcon) pwaIcon.value = hc.pwaIcon || '';
             } catch(e) {}
         }
     }

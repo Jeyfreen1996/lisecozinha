@@ -5,6 +5,14 @@
     <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
     <title>Lise Cozinha | Gastronomia Saudável & Marmitas Fit</title>
     <meta name="description" content="Gastronomia saudável e marmitas fit ultra-congeladas feitas com ingredientes selecionados. Prático, nutritivo e delicioso." />
+    
+    <!-- PWA Tags -->
+    <meta name="theme-color" content="#012d1d" id="pwa-theme-color">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
+    <link rel="manifest" href="" id="pwa-manifest">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
@@ -101,10 +109,13 @@
                 <span class="material-symbols-outlined">menu</span>
             </button>
             <a href="/" class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
-                <div>
-                    <h1 class="font-headline-md text-lg md:text-xl font-bold text-primary tracking-tight tenant-store-name">Lise Cozinha</h1>
-                    <span id="store-status-badge" class="hidden"></span>
+                <div id="store-logo-container" class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow" id="default-logo-icon">L</div>
+                    <img id="dynamic-logo-img" src="" alt="Logo" class="hidden h-9 object-contain" />
+                    <div>
+                        <h1 class="font-headline-md text-lg md:text-xl font-bold text-primary tracking-tight tenant-store-name" id="store-title-text">Lise Cozinha</h1>
+                        <span id="store-status-badge" class="hidden"></span>
+                    </div>
                 </div>
             </a>
         </div>
