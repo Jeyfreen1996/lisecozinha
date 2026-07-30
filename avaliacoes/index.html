@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
     <link rel="manifest" href="" id="pwa-manifest">
 
@@ -35,8 +36,8 @@
             } catch(e) {}
         })();
     </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <style>
+        /* Anti-FOUT: Hide raw ligature text before font loads */
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             opacity: 0;
