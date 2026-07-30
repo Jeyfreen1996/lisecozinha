@@ -62,18 +62,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const { outcome } = await deferredPrompt.userChoice;
                     console.log('PWA Installation outcome:', outcome);
                     if (outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
+                        installBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">progress_activity</span> Instalando... aguarde';
+                        installBtn.disabled = true;
+                        installBtn.classList.add('opacity-80');
+                        showToast('Instalando aplicativo, por favor aguarde um momento...', 'info');
+                    } else {
+                        dismissPwaBanner();
                     }
                 } catch (err) {
                     console.error('Failed to install PWA:', err);
+                    dismissPwaBanner();
                 }
                 deferredPrompt = null;
-                dismissPwaBanner();
             } else {
                 console.warn('deferredPrompt is null');
             }
         });
     }
+});
+
+// Listen for successful installation
+window.addEventListener('appinstalled', () => {
+    showToast('¡Lise Cozinha foi instalada com sucesso no seu dispositivo!', 'success');
+    dismissPwaBanner();
 });
 
 // Dynamic Store Open/Closed Badge Status
