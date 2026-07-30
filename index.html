@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
-    <link rel="manifest" href="" id="pwa-manifest">
+    <link rel="manifest" href="/manifest.json" id="pwa-manifest">
 
     <!-- Anti-FOUC for Homepage Customizations -->
     <script>
@@ -281,68 +281,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Product Card 1 -->
-                <div class="product-card bg-white rounded-2xl overflow-hidden organic-shadow flex flex-col justify-between p-4 border border-outline-variant/20" data-id="p1" data-name="Frango com Batata Doce" data-price="24.90">
-                    <div>
-                        <div class="h-44 rounded-xl overflow-hidden mb-4 relative">
-                            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80" alt="Frango com Batata Doce"/>
-                            <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">Fit & Proteico</span>
-                        </div>
-                        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Frango com Batata Doce</h4>
-                        <p class="text-on-surface-variant text-xs mb-4">Frango desfiado suculento marinado no limão, batata doce assada e legumes no vapor.</p>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
-                        <div>
-                            <span class="text-[10px] text-on-surface-variant uppercase font-bold block">Preço</span>
-                            <span class="font-price-display text-primary text-xl font-bold">R$ 24,90</span>
-                        </div>
-                        <button class="bg-secondary text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-md font-label-md text-xs font-bold" onclick="addToCart({id: 'p1', name: 'Frango com Batata Doce', price: 24.90, image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80'})">
-                            <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Product Card 2 -->
-                <div class="product-card bg-white rounded-2xl overflow-hidden organic-shadow flex flex-col justify-between p-4 border border-outline-variant/20" data-id="p2" data-name="Escondidinho de Carne Couve-Flor" data-price="26.50">
-                    <div>
-                        <div class="h-44 rounded-xl overflow-hidden mb-4 relative">
-                            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80" alt="Escondidinho de Carne"/>
-                            <span class="absolute top-3 left-3 bg-secondary text-white text-xs px-3 py-1 rounded-full font-label-md">Low Carb</span>
-                        </div>
-                        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Escondidinho de Carne</h4>
-                        <p class="text-on-surface-variant text-xs mb-4">Carne moída premium magra com purê cremoso de couve-flor gratinado com queijo leve.</p>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
-                        <div>
-                            <span class="text-[10px] text-on-surface-variant uppercase font-bold block">Preço</span>
-                            <span class="font-price-display text-primary text-xl font-bold">R$ 26,50</span>
-                        </div>
-                        <button class="bg-secondary text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-md font-label-md text-xs font-bold" onclick="addToCart({id: 'p2', name: 'Escondidinho de Carne Couve-Flor', price: 26.50, image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80'})">
-                            <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Product Card 3 -->
-                <div class="product-card bg-white rounded-2xl overflow-hidden organic-shadow flex flex-col justify-between p-4 border border-outline-variant/20" data-id="p3" data-name="Sopa de Abóbora com Gengibre" data-price="19.90">
-                    <div>
-                        <div class="h-44 rounded-xl overflow-hidden mb-4 relative">
-                            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=500&q=80" alt="Sopa de Abóbora"/>
-                            <span class="absolute top-3 left-3 bg-primary/90 text-white text-xs px-3 py-1 rounded-full font-label-md">Detox & Leve</span>
-                        </div>
-                        <h4 class="font-headline-md text-lg font-bold text-primary mb-1">Sopa de Abóbora & Gengibre</h4>
-                        <p class="text-on-surface-variant text-xs mb-4">Cremosa, nutritiva com toque sutil de gengibre fresco e sementes de abóbora tostadas.</p>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
-                        <div>
-                            <span class="text-[10px] text-on-surface-variant uppercase font-bold block">Preço</span>
-                            <span class="font-price-display text-primary text-xl font-bold">R$ 19,90</span>
-                        </div>
-                        <button class="bg-secondary text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-md font-label-md text-xs font-bold" onclick="addToCart({id: 'p3', name: 'Sopa de Abóbora com Gengibre', price: 19.90, image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=500&q=80'})">
-                            <span class="material-symbols-outlined text-sm">add_shopping_cart</span> Adicionar
-                        </button>
-                    </div>
-                </div>
+                <!-- Products will load dynamically -->
             </div>
         </div>
     </section>
@@ -441,39 +380,7 @@
         <div class="max-w-7xl mx-auto px-4 md:px-8">
             <h3 class="font-headline-lg text-2xl md:text-3xl font-bold text-center mb-8">Quem provou, amou!</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                    <div class="flex text-secondary-container mb-3">
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                    </div>
-                    <p class="italic text-sm mb-4">"As marmitas da Lise salvaram minha dieta! O tempero é maravilhoso e nem parece que é congelado."</p>
-                    <span class="font-bold text-xs">Mariana Silva</span>
-                </div>
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                    <div class="flex text-secondary-container mb-3">
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                    </div>
-                    <p class="italic text-sm mb-4">"Praticidade incrível para quem trabalha o dia todo. O frango com batata doce é meu favorito!"</p>
-                    <span class="font-bold text-xs">Ricardo Oliveira</span>
-                </div>
-                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                    <div class="flex text-secondary-container mb-3">
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                        <span class="material-symbols-outlined fill text-sm">star</span>
-                    </div>
-                    <p class="italic text-sm mb-4">"Comida saudável de verdade. A entrega foi super rápida e o atendimento pelo WhatsApp nota 10."</p>
-                    <span class="font-bold text-xs">Camila Mendes</span>
-                </div>
+                <!-- Reviews will load dynamically -->
             </div>
             <div class="text-center mt-8">
                 <a href="/avaliacoes" class="inline-block bg-white/20 hover:bg-white/30 text-white font-label-md text-sm px-6 py-2.5 rounded-full transition-colors">Ver todas as avaliações</a>
