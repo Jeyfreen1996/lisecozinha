@@ -260,9 +260,21 @@
 
     async function loadMenuFromSupabase() {
         if (typeof fetchProductsFromSupabase !== 'function') return;
+
+        // 1. Instant load from cache
+        const cached = localStorage.getItem('lise_products_cache');
+        if (cached) {
+            try {
+                allProducts = JSON.parse(cached);
+                renderMenuGrid();
+            } catch(e) {}
+        }
+
+        // 2. Fetch fresh data
         const products = await fetchProductsFromSupabase();
         if (products && products.length > 0) {
             allProducts = products;
+            localStorage.setItem('lise_products_cache', JSON.stringify(products));
             renderMenuGrid();
         }
     }

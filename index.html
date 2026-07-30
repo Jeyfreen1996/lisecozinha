@@ -562,14 +562,43 @@
     async function loadHomeData() {
         if (typeof fetchProductsFromSupabase !== 'function') return;
 
-        // Fetch highlighted products
+        // 1. Instant load from cache
+        const cachedProducts = localStorage.getItem('lise_products_cache');
+        if (cachedProducts) {
+            try {
+                const products = JSON.parse(cachedProducts);
+                renderHomeProducts(products);
+            } catch(e) {}
+        }
+        
+        const cachedReviews = localStorage.getItem('lise_reviews_cache');
+        if (cachedReviews) {
+            try {
+                const reviews = JSON.parse(cachedReviews);
+                renderHomeReviews(reviews);
+            } catch(e) {}
+        }
+
+        // 2. Fetch fresh data
         const products = await fetchProductsFromSupabase();
         if (products && products.length > 0) {
-            const container = document.querySelector('#cardapio .grid');
-            if (container) {
-                const highlights = products.filter(p => p.is_highlight || p.category_slug === 'Fit').slice(0, 3);
-                if (highlights.length > 0) {
-                    container.innerHTML = highlights.map(p => `
+            localStorage.setItem('lise_products_cache', JSON.stringify(products));
+            renderHomeProducts(products);
+        }
+
+        const reviews = await fetchReviewsFromSupabase();
+        if (reviews && reviews.length > 0) {
+            localStorage.setItem('lise_reviews_cache', JSON.stringify(reviews));
+            renderHomeReviews(reviews);
+        }
+    }
+
+    function renderHomeProducts(products) {
+        const container = document.querySelector('#cardapio .grid');
+        if (container) {
+            const highlights = products.filter(p => p.is_highlight || p.category_slug === 'Fit').slice(0, 3);
+            if (highlights.length > 0) {
+                container.innerHTML = highlights.map(p => `
                         <div class="product-card bg-white rounded-2xl overflow-hidden organic-shadow flex flex-col justify-between p-4 border border-outline-variant/20" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}">
                             <div>
                                 <div class="h-44 rounded-xl overflow-hidden mb-4 relative">
@@ -590,25 +619,22 @@
                             </div>
                         </div>
                     `).join('');
-                }
             }
         }
+    }
 
-        // Fetch reviews
-        const reviews = await fetchReviewsFromSupabase();
-        if (reviews && reviews.length > 0) {
-            const reviewsContainer = document.querySelector('section.bg-primary .grid');
-            if (reviewsContainer) {
-                reviewsContainer.innerHTML = reviews.slice(0, 3).map(r => `
-                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                        <div class="flex text-secondary-container mb-3">
-                            ${'<span class="material-symbols-outlined fill text-sm">star</span>'.repeat(r.rating)}
-                        </div>
-                        <p class="italic text-sm mb-4">"${r.comment}"</p>
-                        <span class="font-bold text-xs">${r.customer_name}</span>
+    function renderHomeReviews(reviews) {
+        const reviewsContainer = document.querySelector('section.bg-primary .grid');
+        if (reviewsContainer) {
+            reviewsContainer.innerHTML = reviews.slice(0, 3).map(r => `
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
+                    <div class="flex text-secondary-container mb-3">
+                        ${'<span class="material-symbols-outlined fill text-sm">star</span>'.repeat(r.rating)}
                     </div>
-                `).join('');
-            }
+                    <p class="italic text-sm mb-4">"${r.comment}"</p>
+                    <span class="font-bold text-xs">${r.customer_name}</span>
+                </div>
+            `).join('');
         }
     }
 

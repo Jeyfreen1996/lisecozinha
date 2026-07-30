@@ -283,8 +283,24 @@
 
     async function loadReviewsFromSupabase() {
         if (typeof fetchReviewsFromSupabase !== 'function') return;
+
+        // 1. Instant load from cache
+        const cached = localStorage.getItem('lise_reviews_cache');
+        if (cached) {
+            try {
+                const cachedReviews = JSON.parse(cached);
+                renderReviews(cachedReviews);
+            } catch(e) {}
+        }
+
+        // 2. Fetch fresh data
         const reviews = await fetchReviewsFromSupabase();
         if (!reviews) return;
+        localStorage.setItem('lise_reviews_cache', JSON.stringify(reviews));
+        renderReviews(reviews);
+    }
+
+    function renderReviews(reviews) {
 
         // Calculate statistics
         if (reviews.length > 0) {
