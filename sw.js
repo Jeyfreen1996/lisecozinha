@@ -2,7 +2,6 @@ const CACHE_NAME = 'lise-cozinha-v1';
 const ASSETS = [
     '/',
     '/index.html',
-    '/assets/css/style.css',
     '/assets/js/app.js',
     '/assets/js/supabase.js'
 ];
