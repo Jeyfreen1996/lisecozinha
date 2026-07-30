@@ -10,6 +10,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
+    <link rel="manifest" href="" id="pwa-manifest">
+
+    <!-- Anti-FOUC for Customizations -->
+    <script>
+        (function(){
+            try {
+                const cached = localStorage.getItem('lise_settings');
+                if (cached) {
+                    const hcStr = JSON.parse(cached)['homepage_config'];
+                    if (hcStr) {
+                        const hc = typeof hcStr === 'object' ? hcStr : JSON.parse(hcStr);
+                        let css = '';
+                        if (hc.logo && hc.logo.length > 5) {
+                            css += `#default-logo-icon { display: none !important; } `;
+                            css += `#dynamic-logo-img { display: block !important; content: url('${hc.logo}') !important; } `;
+                        }
+                        if (css) {
+                            const style = document.createElement('style');
+                            style.innerHTML = css;
+                            document.head.appendChild(style);
+                        }
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
     <style>
         /* Anti-FOUT: Hide raw ligature text before font loads */
         .material-symbols-outlined {
@@ -95,8 +122,11 @@
                 <span class="material-symbols-outlined">menu</span>
             </button>
             <a href="/" class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
-                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+                <div id="store-logo-container" class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow" id="default-logo-icon">L</div>
+                    <img id="dynamic-logo-img" src="" alt="Logo" class="hidden h-9 object-contain" />
+                    <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight tenant-store-name" id="store-title-text">Lise Cozinha</h1>
+                </div>
             </a>
         </div>
         

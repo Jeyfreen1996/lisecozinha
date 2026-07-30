@@ -8,9 +8,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <style>
-        /* Anti-FOUT: Hide raw ligature text before font loads */
+    <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
+    <link rel="manifest" href="" id="pwa-manifest">
+
+    <!-- Anti-FOUC for Customizations -->
+    <script>
+        (function(){
+            try {
+                const cached = localStorage.getItem('lise_settings');
+                if (cached) {
+                    const hcStr = JSON.parse(cached)['homepage_config'];
+                    if (hcStr) {
+                        const hc = typeof hcStr === 'object' ? hcStr : JSON.parse(hcStr);
+                        let css = '';
+                        if (hc.logo && hc.logo.length > 5) {
+                            css += `#default-logo-icon { display: none !important; } `;
+                            css += `#dynamic-logo-img { display: block !important; content: url('${hc.logo}') !important; } `;
+                        }
+                        if (css) {
+                            const style = document.createElement('style');
+                            style.innerHTML = css;
+                            document.head.appendChild(style);
+                        }
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             opacity: 0;
@@ -94,8 +120,11 @@
                 <span class="material-symbols-outlined">menu</span>
             </button>
             <a href="/" class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow">L</div>
-                <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight">Lise Cozinha</h1>
+                <div id="store-logo-container" class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-base shadow" id="default-logo-icon">L</div>
+                    <img id="dynamic-logo-img" src="" alt="Logo" class="hidden h-9 object-contain" />
+                    <h1 class="font-headline-md text-xl font-bold text-primary tracking-tight tenant-store-name" id="store-title-text">Lise Cozinha</h1>
+                </div>
             </a>
         </div>
         
@@ -178,75 +207,7 @@
 
     <!-- Reviews Grid -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" id="reviews-container">
-        
-        <!-- Featured Review -->
-        <article class="md:col-span-2 bg-surface-container-lowest p-6 md:p-8 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="material-symbols-outlined text-secondary fill">verified</span>
-                    <span class="font-label-md text-xs font-bold text-primary uppercase tracking-wider">Depoimento em Destaque</span>
-                </div>
-                <p class="font-body-lg text-base md:text-lg italic text-on-surface mb-6">"A Lise Cozinha mudou minha relação com comida congelada. O tempero é verdadeiramente caseiro, os ingredientes são frescos e o sabor é surpreendente para uma dieta low carb. Recomendo de olhos fechados!"</p>
-            </div>
-            <div class="flex items-center justify-between border-t border-outline-variant/20 pt-4">
-                <div>
-                    <h4 class="font-headline-md font-bold text-primary text-base">Mariana Silva</h4>
-                    <p class="text-on-surface-variant text-xs font-label-md">Nutricionista & Cliente Frequente</p>
-                </div>
-                <div class="flex text-secondary font-bold text-sm">
-                    ★★★★★
-                </div>
-            </div>
-        </article>
-
-        <!-- Review Card 1 -->
-        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
-                <p class="text-on-surface-variant text-sm mb-4">"Praticidade e sabor imbatíveis! O Escondidinho de Carne com Couve-Flor é sensacional. Perfeito para quem tem dias áridos no trabalho."</p>
-            </div>
-            <div class="border-t border-outline-variant/20 pt-3">
-                <h4 class="font-label-md font-bold text-primary text-sm">Ricardo Torres</h4>
-                <p class="text-on-surface-variant text-[11px]">Cliente desde Jan 2024</p>
-            </div>
-        </article>
-
-        <!-- Review Card 2 -->
-        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
-                <p class="text-on-surface-variant text-sm mb-4">"Entregas sempre pontuais em Armazém/SC. Marmitas muito bem embaladas e esquentam por igual no micro-ondas."</p>
-            </div>
-            <div class="border-t border-outline-variant/20 pt-3">
-                <h4 class="font-label-md font-bold text-primary text-sm">Juliana Alencar</h4>
-                <p class="text-on-surface-variant text-[11px]">Pediu 8 veces</p>
-            </div>
-        </article>
-
-        <!-- Review Card 3 -->
-        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
-                <p class="text-on-surface-variant text-sm mb-4">"A Sopa de Abóbora com Gengibre é um abraço quentinho à noite. Comida leve e super nutritiva."</p>
-            </div>
-            <div class="border-t border-outline-variant/20 pt-3">
-                <h4 class="font-label-md font-bold text-primary text-sm">Felipe Martins</h4>
-                <p class="text-on-surface-variant text-[11px]">Atleta Amador</p>
-            </div>
-        </article>
-
-        <!-- Review Card 4 -->
-        <article class="bg-surface-container-lowest p-6 rounded-2xl organic-shadow border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-                <div class="flex text-secondary text-sm mb-3">★★★★★</div>
-                <p class="text-on-surface-variant text-sm mb-4">"O brownie proteico de cacau 70% tirou minha vontade de doces sem estragar a dieta. Perfeito!"</p>
-            </div>
-            <div class="border-t border-outline-variant/20 pt-3">
-                <h4 class="font-label-md font-bold text-primary text-sm">Beatriz Souza</h4>
-                <p class="text-on-surface-variant text-[11px]">Cliente Verificada</p>
-            </div>
-        </article>
-
+        <!-- Reviews will be loaded dynamically -->
     </section>
 </main>
 
