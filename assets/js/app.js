@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCart();
     checkStoreStatus();
     updateActiveOrdersBadge();
+    loadHomepageConfig();
 });
 
 // Dynamic Store Open/Closed Badge Status
@@ -109,6 +110,39 @@ async function updateActiveOrdersBadge() {
         });
     } catch(e) {
         console.warn('Error checking active orders:', e);
+    }
+}
+
+// Load Homepage Customization
+async function loadHomepageConfig() {
+    if (typeof fetchSettingsFromSupabase !== 'function') return;
+
+    try {
+        const s = await fetchSettingsFromSupabase() || {};
+        const cached = localStorage.getItem('lise_settings');
+        let localS = {};
+        if (cached) {
+            try { localS = JSON.parse(cached); } catch(e) {}
+        }
+        const settings = { ...localS, ...s };
+        
+        if (settings['homepage_config']) {
+            const hc = typeof settings['homepage_config'] === 'object' ? settings['homepage_config'] : JSON.parse(settings['homepage_config']);
+            
+            const img1 = document.getElementById('hero-slide-1');
+            const img2 = document.getElementById('hero-slide-2');
+            const tag = document.getElementById('hero-tag');
+            const title = document.getElementById('hero-title');
+            const desc = document.getElementById('hero-desc');
+            
+            if (img1 && hc.img1) img1.style.backgroundImage = `url('${hc.img1}')`;
+            if (img2 && hc.img2) img2.style.backgroundImage = `url('${hc.img2}')`;
+            if (tag && hc.tag) tag.innerText = hc.tag;
+            if (title && hc.title) title.innerText = hc.title;
+            if (desc && hc.desc) desc.innerText = hc.desc;
+        }
+    } catch(e) {
+        console.warn('Error loading homepage config:', e);
     }
 }
 
