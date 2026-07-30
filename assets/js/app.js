@@ -44,7 +44,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     setTimeout(() => {
         const banner = document.getElementById('pwa-install-banner');
         if (banner) banner.classList.remove('translate-y-[150%]');
-    }, 1500);
+    }, 100);
 });
 
 function dismissPwaBanner() {
@@ -57,10 +57,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (installBtn) {
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('PWA Installation outcome:', outcome);
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                } catch (err) {
+                    console.error('Failed to install PWA:', err);
+                }
                 deferredPrompt = null;
                 dismissPwaBanner();
+            } else {
+                console.warn('deferredPrompt is null');
             }
         });
     }
