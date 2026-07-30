@@ -13,6 +13,33 @@
     <link rel="apple-touch-icon" href="/assets/img/icon-192.png" id="pwa-apple-icon">
     <link rel="manifest" href="" id="pwa-manifest">
 
+    <!-- Anti-FOUC for Homepage Customizations -->
+    <script>
+        (function(){
+            try {
+                const cached = localStorage.getItem('lise_settings');
+                if (cached) {
+                    const hcStr = JSON.parse(cached)['homepage_config'];
+                    if (hcStr) {
+                        const hc = typeof hcStr === 'object' ? hcStr : JSON.parse(hcStr);
+                        let css = '';
+                        if (hc.img1) css += `#hero-slide-1 { background-image: url('${hc.img1}') !important; } `;
+                        if (hc.img2) css += `#hero-slide-2 { background-image: url('${hc.img2}') !important; } `;
+                        if (hc.logo && hc.logo.length > 5) {
+                            css += `#default-logo-icon { display: none !important; } `;
+                            css += `#dynamic-logo-img { display: block !important; content: url('${hc.logo}') !important; } `;
+                        }
+                        if (css) {
+                            const style = document.createElement('style');
+                            style.innerHTML = css;
+                            document.head.appendChild(style);
+                        }
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet"/>
@@ -455,6 +482,25 @@
     </section>
 </main>
 
+<!-- PWA Install Banner -->
+<div id="pwa-install-banner" class="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:w-80 bg-surface-container shadow-2xl rounded-2xl p-4 border border-outline-variant/30 z-50 flex flex-col gap-3 translate-y-[150%] transition-transform duration-500 ease-out">
+    <div class="flex items-start justify-between gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
+            <span class="material-symbols-outlined">install_mobile</span>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-primary text-sm">Instale nosso App!</h4>
+            <p class="text-xs text-on-surface-variant leading-tight mt-0.5">Faça seus pedidos mais rápido direto da tela inicial do seu celular.</p>
+        </div>
+        <button onclick="dismissPwaBanner()" class="text-on-surface-variant hover:bg-surface-container-high p-1 rounded-full transition-colors active:scale-95 shrink-0">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+    </div>
+    <button id="pwa-install-btn" class="w-full bg-primary text-white py-2.5 rounded-xl font-bold text-xs hover:bg-primary-container transition-all shadow-md active:scale-95">
+        Instalar Aplicativo
+    </button>
+</div>
+
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant/30 shadow-[0px_-4px_20px_rgba(27,67,50,0.05)] rounded-t-xl px-2 py-2 flex justify-between items-center pb-safe max-w-2xl left-1/2 -translate-x-1/2 md:hidden">
     <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/" data-nav="inicio">
@@ -478,10 +524,6 @@
             <span id="bottom-nav-active-order-dot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-600 border-2 border-surface rounded-full hidden"></span>
         </div>
         <span class="text-[10px] font-label-md">Pedidos</span>
-    </a>
-    <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/avaliacoes" data-nav="avaliacoes">
-        <span class="material-symbols-outlined">reviews</span>
-        <span class="text-[10px] font-label-md">Avaliações</span>
     </a>
     <a class="bottom-nav-link flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 w-1/5 py-1" href="/perfil" data-nav="perfil">
         <span class="material-symbols-outlined">person</span>

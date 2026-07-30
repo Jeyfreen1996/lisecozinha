@@ -35,6 +35,37 @@ function registerServiceWorker() {
     }
 }
 
+// PWA Installation Logic
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show banner after a slight delay for better UX
+    setTimeout(() => {
+        const banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.classList.remove('translate-y-[150%]');
+    }, 1500);
+});
+
+function dismissPwaBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.add('translate-y-[150%]');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                dismissPwaBanner();
+            }
+        });
+    }
+});
+
 // Dynamic Store Open/Closed Badge Status
 async function checkStoreStatus() {
     let settings = {};
